@@ -1,0 +1,118 @@
+{
+  "my_config": [
+    {
+      "value": "met_CSR_",
+      "label": "参诉人信息细致性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "met_AJJBQK_",
+      "label": "事实部分细致性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "met_CPFXGC_",
+      "label": "理由部分细致性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "del_date_",
+      "label": "延迟性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "aut_AY_",
+      "label": "案由信息类别规范性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "aut_CPYJ_",
+      "label": "裁判依据引用规范性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "com_PJNR_",
+      "label": "判决内容说明完整性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "com_SFCD_",
+      "label": "诉费承担说明完整性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "con_num_",
+      "label": "数字使用一致性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "con_pun_",
+      "label": "标点符号使用一致性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "rea_SSMS_",
+      "label": "事实描述部分简明性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "rea_ZYJD_",
+      "label": "争议焦点条理性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "acc_GCSX_",
+      "label": "构成事项准确性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "acc_SLJG_",
+      "label": "审理经过准确性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "acc_CSR_",
+      "label": "参诉人信息准确性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "text_style_classification_",
+      "label": "语言风格鲜明性",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "sentiment_index_",
+      "label": "客观程度",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "copy_detect_index_",
+      "label": "语言抄袭检测",
+      "component": "switch",
+      "type": "number"
+    },
+    {
+      "value": "law_articles_rational_",
+      "label": "法条合理性",
+      "component": "switch",
+      "type": "number"
+    }
+  ]
+}

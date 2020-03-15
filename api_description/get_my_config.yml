@@ -1,0 +1,14 @@
+tags:
+  - 'default-config'
+summary: 获取默认配置
+operationId: getDefaultConfig
+responses:
+  200:
+    description: 拿到默认配置
+    schema:
+      type: array
+      items: object
+  500:
+    description: 服务器内部出错
+    schema:
+      type: string

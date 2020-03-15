@@ -1,0 +1,16 @@
+tags:
+  - 'writ-report'
+summary: 拿取报告。由于一篇文书只有一篇报告，这里用文书id拿去报告。
+operationId: getWritReport
+parameters:
+  - name: 'writ-id'
+    required: true
+    description: 文书的id
+    type: string
+    in: query
+responses:
+  200:
+    description: 查到对应报告
+    schema:
+      type: array
+      items: object

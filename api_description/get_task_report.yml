@@ -1,0 +1,15 @@
+tags:
+  - 'task-report'
+summary: 拿取总体报告
+operationId: getTaskReport
+parameters:
+  - name: 'task-id'
+    required: true
+    description: 任务的id
+    type: integer
+    format: int64
+    minimum: 1
+    in: path
+responses:
+  200:
+    description: 查到对应报告

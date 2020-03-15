@@ -1,0 +1,3 @@
+definitions:
+  ApiResponse:
+    type: string
