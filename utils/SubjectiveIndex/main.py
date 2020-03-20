@@ -6,8 +6,9 @@ import config as cf
 from utils.SubjectiveIndex.sentiment_classify import sentiment_index as sentiment
 from utils.SubjectiveIndex.sentiment_classify import sentiment_index1 as text_style
 import numpy as np
+from utils.lda.lda import law_index
 
-# 要修改的
+
 def text_style_classification(AJJBQK_txt):
     res = text_style(AJJBQK_txt)
     res_score = 0
@@ -15,9 +16,9 @@ def text_style_classification(AJJBQK_txt):
         return cf.sentiment_classify_score
     else:
         for tup in res:
-            if tup[1] > cf.sentiment_classify_threshold:
-                res_score -= cf.sentiment_classify_fault
-        res_score += cf.sentiment_classify_score
+            if tup[1] < cf.text_style_classify_threshold:
+                res_score -= cf.text_style_classify_fault
+        res_score += cf.text_style_classify_score
     if res_score < 0:
         res_score = 0
     return res_score, res
@@ -89,7 +90,7 @@ def subjective_measure(filepath, index_dic, subject_index, wenshu_corr):
     subject_score_dic = {}
     xml_file = etree.parse(filepath)
     root_node = xml_file.getroot()[0]
-    law_articles_res = ['民事诉讼法第31条，民事诉讼法第281条']
+    law_articles_res = []
     sentiment_res = []
     text_style_res = []
     copy_detect_res = ''
@@ -140,7 +141,7 @@ def subjective_measure(filepath, index_dic, subject_index, wenshu_corr):
         print('text_style_classification:', cf.text_style_classify_score)
         res.append(cf.text_style_classify_score)
     if 'law_articles_rational_' in index_dic.keys() and index_dic['law_articles_rational_'] == 1:
-        tmp_score = cf.law_articles_rational_score
+        tmp_score,law_articles_res = law_index(filepath)
         subject_score += tmp_score
         print('law_article_index:', tmp_score)
         res.append(tmp_score)
@@ -151,9 +152,9 @@ def subjective_measure(filepath, index_dic, subject_index, wenshu_corr):
                                                           cf.law_articles_rational_score]
         subject_score += cf.law_articles_rational_score
         print('law_article_index:', cf.law_articles_rational_score)
-        # res.append(cf.law_articles_rational_score)
+        res.append(cf.law_articles_rational_score)
     print(subject_score, wenshu_corr)
-    return subject_score, wenshu_corr, subject_score_dic, law_articles_res, sentiment_res, text_style_res, copy_detect_res
+    return subject_score, wenshu_corr, subject_score_dic, law_articles_res, sentiment_res, text_style_res, copy_detect_res,res
 
 
 if __name__ == '__main__':

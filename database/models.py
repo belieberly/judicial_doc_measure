@@ -8,8 +8,8 @@ class User(db.Model):
     __tablename__ = 'users'
     # 如果使用自增字段不要使用init函数
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(255))
-    password = db.Column(db.String(255))
+    username = db.Column(db.String(255),nullable=False)
+    password = db.Column(db.String(255),nullable=False)
     docs = db.relationship(
         'JudicialDoc',
         backref='users',
@@ -40,7 +40,7 @@ class JudicialDoc(db.Model):
     # Set the name for table
     __tablename__ = 'judicial_docs'
     id = db.Column(db.String(50), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),nullable=False)
     task_id = db.Column(db.Integer,db.ForeignKey('tasks.id'))
     docname = db.Column(db.String(255), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
@@ -66,7 +66,7 @@ class JudicialDoc(db.Model):
 class Task(db.Model):
     __tablename__ = 'tasks'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),nullable=False)
     name = db.Column(db.String(20), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
     progress_status = db.Column(db.Enum('untested','waiting','testing','finished','wrong','accident'), nullable=False)
@@ -89,19 +89,19 @@ class Task(db.Model):
 class Report(db.Model):
     __tablename__ = 'reports'
     id = db.Column(db.String(50), primary_key=True)
-    doc_id = db.Column(db.String(50), db.ForeignKey('judicial_docs.id'))
+    doc_id = db.Column(db.String(50), db.ForeignKey('judicial_docs.id'),nullable=False)
     loc = db.Column(db.String(200), nullable=False)
 
 
 class AnalysisReport(db.Model):
     __tablename__ = 'analysis_reports'
     id = db.Column(db.String(50), primary_key=True)
-    task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'))
+    task_id = db.Column(db.Integer, db.ForeignKey('tasks.id'),nullable=False)
     loc = db.Column(db.String(200), nullable=False)
 
 
 class Config(db.Model):
     __tablename__ = 'configs'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    config_json = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),nullable=False)
+    config_json = db.Column(db.String(500), nullable=False)

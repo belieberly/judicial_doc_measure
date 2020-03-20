@@ -8,7 +8,7 @@ import uuid
 from utils import measure
 from utils import analysis
 
-from web_utils import __init__
+import web_utils
 
 blueprint_task_report = Blueprint('task_report', __name__)
 
@@ -48,7 +48,7 @@ def build_task():
 
 def task_measure(writ_id_list, input_index_dic, task_name):
     tmp_task_uuid = str(uuid.uuid4())
-    task = Task(id=tmp_task_uuid, user_id=__init__.get_userid(), name=task_name)
+    task = Task(id=tmp_task_uuid, user_id=web_utils.get_userid(), name=task_name)
     report_path_list = []
     province_dic = {}
     writ_date_dic = {}
@@ -58,7 +58,7 @@ def task_measure(writ_id_list, input_index_dic, task_name):
         writ.task_id = tmp_task_uuid
         filepath = writ.loc
         file_name = writ.docname
-        file_date = __init__.time2timestamp(writ.date)
+        file_date = web_utils.time2timestamp(writ.date)
         print(file_date)
         report_json, province, writ_date = measure.doc_measure(filepath, input_index_dic)
         report_json['title'] = file_name

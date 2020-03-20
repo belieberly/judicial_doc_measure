@@ -1,31 +1,29 @@
-from flask import Config
-from sqlalchemy import create_engine
+# MySQL connection
+# DB_URI = 'mysql+mysqldb://{}:{}@{}/{}.format(USERNAME，PASSWORD，HOSTNAME，PORT，DATABASE)'
+import os
 
+DevConfig = {
+    'DEBUG': True,
+    'SQLALCHEMY_TRACK_MODIFICATIONS': False,
+    'CELERY_ACCEPT_CONTENT': ['pickle', 'json', 'msgpack', 'yaml'],
+    'SQLALCHEMY_DATABASE_URI': 'mysql+pymysql://root:ilynsm77@localhost:3306/judicial_doc_measurement',
+    'BROKER_URL': 'redis://localhost:6379/0',
+    'CELERY_RESULT_BACKEND': 'redis://localhost:6379/0'
+}
 
-# 数据库连接配置
-class DevConfig(Config):
-    """Development config class."""
-    DEBUG = True
-    # MySQL connection
-    # DB_URI = 'mysql+mysqldb://{}:{}@{}/{}.format(USERNAME，PASSWORD，HOSTNAME，PORT，DATABASE)'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    CELERY_ACCEPT_CONTENT = ['pickle', 'json', 'msgpack', 'yaml']
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:ilynsm77@localhost:3306/judicial_doc_measurement'
-    BROKER_URL = 'redis://localhost:6379/0'
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-
+usr_cwd = 'E:/pycharm/judicial_doc_measurement'
+web_data_path = os.path.join(usr_cwd, 'web_data')
 # 上传文件默认路径
-upload_base_dir = 'E:/pycharm/judicial_doc_measurement/web_data/upload_files/'
+upload_base_dir = web_data_path + '/upload_files/'
 
 # 报告保存默认路径
-writ_report_base_dir = 'E:/pycharm/judicial_doc_measurement/web_data/writ_report/'
+writ_report_base_dir = web_data_path + '/writ_report/'
 
 # 分析报告默认路径
-task_report_base_dir = 'E:/pycharm/judicial_doc_measurement/web_data/task_report/'
+task_report_base_dir = web_data_path + '/task_report/'
 
 # 标准指标字典json路径
-transfer_config_path = 'E:/pycharm/judicial_doc_measurement/transfer_config.json'
+transfer_config_path = os.path.join(usr_cwd, 'config/transfer_config.json')
 
 # 客观度量指标
 # objective_index = {'细致性': {'参诉人信息细致性': 'met_CSR', '事实部分细致性': 'met_AJJBQK', '理由部分细致性': 'met_CPFXGC'},
@@ -90,12 +88,13 @@ sentiment_classify_fault = 5
 # 文书风格分项总分
 text_style_classify_score = 25
 # 文书风格单句阈值
-text_style_classify_threshold = 0.3
+text_style_classify_threshold = 0.8
 # 文书风格单句扣分
 text_style_classify_fault = 5
 
 # 文书法条相关性
 law_articles_rational_score = 25
+law_articles_rational_base = 10
 law_articles_rational_subscore = 5
 
 # 文书信息延迟性得分

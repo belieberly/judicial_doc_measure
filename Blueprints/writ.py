@@ -1,14 +1,13 @@
 import datetime
 from flasgger import swag_from
 from flask import Blueprint, request, jsonify
-from database.models import db, User, JudicialDoc, Report
+from database.models import db, User, JudicialDoc, Report,Config
 import config as cf
 import zipfile
 import uuid
 import json
 import web_utils
-from my_celery.with_flask_context_task import doc_measure_thread
-from my_celery.with_flask_context_task import flask_app_context
+from my_celery_client import my_celery_app
 
 blueprint_writ = Blueprint('writ', __name__)
 
@@ -21,8 +20,13 @@ def upload_file():
     # db.drop_all()
     db.create_all()
     user = User(username='01', password='123456')
+    config_path = open(cf.transfer_config_path,'r',encoding = 'utf-8')
+    config_str = json.dumps(json.load(config_path),ensure_ascii=False)
+    config = Config(user_id=1,config_json=config_str)
     db.session.add(user)
+    db.session.add(config)
     db.session.commit()
+
     basepath = cf.upload_base_dir
     file_list = request.files.getlist('file')
     # upload_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -180,8 +184,7 @@ def doc_measure():
     try:
         # _thread.start_new_thread(doc_measure_thread,(writ_id,input_index_dic))
         print('celery啥时候调度啊')
-        # doc_measure_thread.delay(writ_id, input_index_dic)
-        flask_app_context.delay()
+        my_celery_app.send_task('doc_measure_thread', args=[writ_id, input_index_dic])
     except:
         print('无法启动线程')
     return '后端开始检测'

@@ -6,7 +6,7 @@
 
 框架：flask 
 
-异步任务调度：celery 3.1.25 + 本地redis
+异步任务调度：celery 3.1.25 + 本地redis（python中redis包要求2.*，不然会有奇怪的错误item错误）
 
 接口文件自动生成：flasgger
 
@@ -14,7 +14,7 @@
 
 数据库：SQLAlchemy +本地mySQL
 
-其他依赖包：requirements.txt
+其他依赖包：requirements.txt 
 
 ### 简介
 

@@ -1,5 +1,5 @@
 from flask import Flask
-from my_celery import my_celery_app
+from my_celery_client import my_celery_app
 from database import db
 from config import DevConfig
 from flasgger import Swagger
@@ -12,7 +12,7 @@ from Blueprints.my_config import blueprint_my_config
 def create_apps():
     # __name__是caller的__name__，到时候就是main
     my_flask_app = Flask(__name__)
-    my_flask_app.config.from_object(DevConfig)
+    my_flask_app.config.update(**DevConfig)
     db.init_app(my_flask_app)
 
     my_flask_app.register_blueprint(blueprint_writ, url_prefix='/writ')
@@ -22,4 +22,4 @@ def create_apps():
 
     Swagger(my_flask_app)
     my_celery_app.conf.update(my_flask_app.config)
-    return my_flask_app, my_celery_app
+    return my_flask_app

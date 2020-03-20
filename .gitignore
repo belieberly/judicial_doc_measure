@@ -18,4 +18,5 @@ temp_env/
 static/
 web_data/
 templates/
+utils/lda/lda_model/topic/
 

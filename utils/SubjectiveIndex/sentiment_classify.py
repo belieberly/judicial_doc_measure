@@ -53,7 +53,7 @@ def sentiment_index(str):
         # positive_porb = res['positive_prob']
         # # negative_prob = res['negative_prob']
         # confidence = res['confidence']
-        if len(sentence.strip())!=0:
+        if len(sentence.strip())>1:
             positive_porb,negative_prob= svm_predict(sentence)
 
             # sentence_score = abs(positive_porb-negative_prob)*confidence
@@ -70,11 +70,11 @@ def sentiment_index1(str):
         # positive_porb = res['positive_prob']
         # # negative_prob = res['negative_prob']
         # confidence = res['confidence']
-        if len(sentence.strip())!=0:
+        if len(sentence.strip())>1:
             positive_porb,negative_prob= svm_predict1(sentence)
 
             # sentence_score = abs(positive_porb-negative_prob)*confidence
-            sentiment_res.append((sentence,abs(positive_porb-0.5)))
+            sentiment_res.append((sentence,positive_porb))
     return sentiment_res
 
 

@@ -1,7 +1,7 @@
 import json
 from utils.ObjectiveIndex import main as obj_main
 from utils.SubjectiveIndex import main as sub_main
-from web_utils import __init__
+import web_utils
 import config as cf
 from xml.etree import ElementTree as etree
 import re
@@ -110,7 +110,7 @@ def doc_measure(filepath, input_index_dic):
     target_file = open(cf.transfer_config_path,'r',encoding = 'utf-8')
     target_index = json.load(target_file)
     # 输入的文书指标和标准指标
-    index_dic = __init__.write_intersect_properties(input_index_dic, target_index)
+    index_dic = web_utils.write_intersect_properties(input_index_dic, target_index)
     wenshu_corr = {'文首': [], "首部": [], "事实": [], "理由": [], "依据": [], "主文": [], "尾部": [], '落款': [], '附件': [], '其他': {}}
     object_index = {"met_CSR_": 1,
                     "met_AJJBQK_": 1,
@@ -134,9 +134,9 @@ def doc_measure(filepath, input_index_dic):
         "law_articles_rational_": 1
     }
     # 和客观指标取交集
-    object_dic = __init__.write_intersect_properties(index_dic, object_index)
+    object_dic = web_utils.write_intersect_properties(index_dic, object_index)
     # 和主观指标取交集
-    subject_dic = __init__.write_intersect_properties(index_dic, subject_index)
+    subject_dic = web_utils.write_intersect_properties(index_dic, subject_index)
 
     object_score, wenshu_corr, object_score_dict, wenshu_content, index_res = obj_main.objective_measure(filepath,
                                                                                                          object_dic,

@@ -8,6 +8,7 @@ import multiprocessing
 from normalize import normalizer
 import os
 import json
+import config as cf
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 
@@ -15,7 +16,7 @@ SOME_FIXED_SEED = 20
 
 
 replace_numbers = re.compile(r'\d+', re.IGNORECASE)
-normalizer_ = normalizer('./word.txt')
+normalizer_ = normalizer('E:/pycharm/judicial_doc_measurement/utils/lda/word.txt')
 word_len = 2
 progress = 0
 
@@ -85,6 +86,8 @@ def data_preprocess():
             law.append(law_tmp)
             path.append(line.strip())
         # 设置数据量
+        if count>=10000:
+            break
         print(count)
     print(len(alltext))
     print('数据读取完成')
@@ -92,12 +95,12 @@ def data_preprocess():
 
 def raw_text_csv(alltext,anyou,law,path):
     df = pd.DataFrame({'text': alltext, 'anyou': anyou, 'law': law, 'path': path})
-    df.to_csv('./lda_model/raw_text.csv', encoding="utf-8-sig")
+    df.to_csv('E:/pycharm/judicial_doc_measurement/utils/lda/lda_model/raw_text.csv', encoding="utf-8-sig")
     print(len(df))
     print('raw_text.csv存储完成')
 
 def text_to_wordlist(text):
-    print('------------text:'+text)
+    # print('------------text:'+text)
     return " ".join(normalizer_.seg_one_text(text,2))
 
 
@@ -122,7 +125,7 @@ def cut_text(alltext):
 def process_csv(alltext):
     train_data = cut_text(alltext)
     df = pd.DataFrame({'text': train_data})
-    df.to_csv('./lda_model/process.csv', encoding="utf-8-sig")
+    df.to_csv('E:/pycharm/judicial_doc_measurement/utils/lda/lda_model/process.csv', encoding="utf-8-sig")
     print('process.csv存储成功')
 
 
@@ -161,11 +164,12 @@ def lda():
     lda.show_topics()
 
 def recommender(file_path):
-    lda = models.LdaModel.load('./lda_model/mylda_v2')
-    dict_1 = corpora.Dictionary.load('./lda_model/dict_v2')
-    tfidf = models.TfidfModel.load("./lda_model/my_model.tfidf")
-    dict_corpora = corpora.mmcorpus.MmCorpus('ths_corpora.mm')
+    lda = models.LdaModel.load('E:/pycharm/judicial_doc_measurement/utils/lda/lda_model/mylda_v2')
+    dict_1 = corpora.Dictionary.load('E:/pycharm/judicial_doc_measurement/utils/lda/lda_model/dict_v2')
+    tfidf = models.TfidfModel.load("E:/pycharm/judicial_doc_measurement/utils/lda/lda_model/my_model.tfidf")
+    dict_corpora = corpora.mmcorpus.MmCorpus('E:/pycharm/judicial_doc_measurement/utils/lda/ths_corpora.mm')
     corpus_tfidf = tfidf[dict_corpora]
+    law_tmp = []
 
 
     #样例输入
@@ -197,7 +201,7 @@ def recommender(file_path):
     for q in topic_num:
         print("%d topic:%s" % (q, lda.print_topic(q)))
 
-    with open("./lda-docs-data.json")as f:
+    with open("E:/pycharm/judicial_doc_measurement/utils/lda/lda-docs-data.json")as f:
         data = f.read()
     dict = json.loads(data)
 
@@ -211,7 +215,7 @@ def recommender(file_path):
             index_num += 1
 
     for q in topic_num:
-        file = "./lda_model/topic/" + str(q) + ".index"
+        file = "E:/pycharm/judicial_doc_measurement/utils/lda/lda_model/topic/" + str(q) + ".index"
         if os.path.exists(file):
             index = similarities.MatrixSimilarity.load(file)
         else:
@@ -222,13 +226,13 @@ def recommender(file_path):
     print(sims)
     sorted_sims = sorted(enumerate(sims), key=lambda item: -item[1])
     # print(sorted_sims)
-    df = pd.read_csv("./lda_model/raw_text.csv", encoding="utf-8", header=None)
+    df = pd.read_csv("E:/pycharm/judicial_doc_measurement/utils/lda/lda_model/raw_text.csv", encoding="utf-8", header=None)
 
     count = 0
     law_articles = []
     for doc in sorted_sims:
         content = df[1][index_dict[doc[0]]]
-        law_article = df[3][index_dict[doc[0]]]
+        law_article = df[2][index_dict[doc[0]]].split(';')
         # if keyword[0] not in content and keyword[1] not in content and keyword[2] not in content\
         # 		and keyword[3] not in content and keyword[4] not in content \
         # 		and keyword[5] not in content and keyword[6] not in content and keyword[7] not in content \
@@ -236,36 +240,62 @@ def recommender(file_path):
         # 	continue
         count += 1
         print("推荐案例%d 相似度：%f\n%s\n" % (index_dict[doc[0]], doc[1], content))
-        law_articles.append(law_article)
-        if count == 500:  # 最相似的
+        law_articles.extend(law_article)
+        if count == 10:  # 最相似的
             break
         print('相似案例法条\n%s'%(';'.join(law_articles)))
     return law_tmp,law_articles,
 def law_index(file_path):
     law_tmp,law_articles = recommender(file_path)
+    law_dic = list2dic(law_articles)
     count = 0
     print(law_tmp,law_articles)
     for i in law_tmp:
-        for j in law_articles:
+        for j in law_dic:
             if i==j:
                 count+=1
     print('相似案件法条数目',count)
+    if count == 0 and len(law_tmp) > 0:
+        res= cf.law_articles_rational_base
+    elif count>0:
+        res= cf.law_articles_rational_subscore*count+cf.law_articles_rational_base
+        if res>cf.law_articles_rational_score:
+            res = cf.law_articles_rational_score
+    else:
+        res = 0
+    a = sorted(law_dic.items(), key=lambda item: item[1],reverse=True)
+    recommend_law = []
+    for num in range(int(len(a)*0.3)):
+        recommend_law.append(a[num])
+    print(res)
+    print(recommend_law)
+    return res,recommend_law
 
+
+
+def list2dic(lis):
+    dic = {}
+    for i in lis:
+        if i in dic.keys():
+            dic[i]+=1
+        else:
+            dic[i]=1
+    return dic
 
 if __name__=='__main__':
     # 预处理准备
-    alltext, anyou, law, path = data_preprocess()
-    # print(alltext)
-    raw_text_csv(alltext, anyou, law, path)
-    process_csv(alltext)
+    # alltext, anyou, law, path = data_preprocess()
+    # # print(alltext)
+    # raw_text_csv(alltext, anyou, law, path)
+    # process_csv(alltext)
 
     #lda模型训练
     # lda()
 
     #相似文书法条推荐
     # recommender()
-    # file_path_test = "D:/NJU/final_project/data/example/0.xml"
-    # law_index(file_path_test)
+    file_path_test = "D:/NJU/final_project/data/example/0.xml"
+    law_index(file_path_test)
 
 
 
