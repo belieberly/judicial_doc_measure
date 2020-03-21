@@ -42,14 +42,14 @@ def task_report(report_path_list, index_dic):
         task_report['vs_standard']['test_value'].append(task_report['avg_score'][index]['score'])
         task_report['vs_standard']['standard_value'].append(names['standard_value'][index])
     task_report['vs_standard']['x_axis'] = task_report['metrics']
-    outputf = open('../test_task_report.json', 'w', encoding='utf-8')
+    outputf = open('../web_data/task_report/test_task_report.json', 'w', encoding='utf-8')
     json.dump(task_report, outputf, ensure_ascii=False)
 
 
 if __name__ == '__main__':
     report_path_list = [
-        'E:/pycharm/judicial_doc_measurement/web_data/writ_report/13309ee2-ed68-4628-a8cf-44f14eec441d.json',
-        'E:/pycharm/judicial_doc_measurement/web_data/writ_report/21de5e9e-17f7-447f-bf77-61b6aee0b08a.json']
+        'E:/pycharm/judicial_doc_measurement/web_data/writ_report/b799e9c9-ede1-4243-ab28-b3d1ea7c1e4e.json',
+        'E:/pycharm/judicial_doc_measurement/web_data/writ_report/2e5ca696-7d11-4aa7-b9a0-6183bf41c094.json']
     index_dic = {
         "met_CSR_": 1,
         "met_AJJBQK_": 1,
