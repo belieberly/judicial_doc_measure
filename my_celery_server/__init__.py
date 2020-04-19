@@ -4,6 +4,10 @@ from flask import Flask
 from config import DevConfig
 from database import db
 
+
+
+
+
 celery_server = Celery(include='my_celery_server.tasks')
 
 celery_server.conf.update(DevConfig)

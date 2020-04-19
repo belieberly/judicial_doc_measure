@@ -265,8 +265,9 @@ def law_index(file_path):
         res = 0
     a = sorted(law_dic.items(), key=lambda item: item[1],reverse=True)
     recommend_law = []
+
     for num in range(int(len(a)*0.3)):
-        recommend_law.append(a[num])
+        recommend_law.append(a[num][0])
     print(res)
     print(recommend_law)
     return res,recommend_law

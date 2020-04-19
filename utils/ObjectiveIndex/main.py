@@ -775,58 +775,10 @@ def baba(filepath):
         json.dump(wenshu_corr, f, ensure_ascii=False)
 
 
-# file_path = input('输入为评估文件名称').strip()
-# file_path = 'D:/NJU/final_project/data/example/' + file_path
-# baba(file_path)
-
 # filepath 待测文书路径
-# index_dic 要检测指标，字典类型，0为不检测，1为检测
-# object_index 标准客观指标字典，默认都为1
-names = locals()
-def objective_measure(filepath, index_dic, object_index, wenshu_corr):
-    object_score = 0
-    object_score_dict = {}
-    xml_file = etree.parse(filepath)
-    root_node = xml_file.getroot()[0]
-    # wenshu_content = {'文首': [], "首部": [], "事实": [], "理由": [], "依据": [], "主文": [], "尾部": [], '落款': [], '其他': {}}
-    wenshu, index = wenshu_analysis(root_node)
-    wenshu_content = get_wenshu_content(wenshu)
-    res = []
-    for index_name in object_index.keys():
-        if index_name in index_dic.keys() and index_name != 'del_date_' and index_name != 'acc_GCSX_' and index_dic[
-            index_name] == 1:
-            index_name = index_name.strip('_')
-            tmp_score, wenshu_corr = globals().get('%s' % index_name)(wenshu, wenshu_corr)
-            print(tmp_score)
-            object_score_dict[index_name] = [tmp_score,names[index_name+'_score']]
-            res.append(tmp_score)
-            object_score += tmp_score
-        elif index_name == 'del_date_' and index_name in index_dic.keys() and index_dic[index_name] == 1:
-            index_name = index_name.strip('_')
-            tmp_score, wenshu_corr = globals().get('%s' % index_name)(root_node, wenshu_corr)
-            object_score += tmp_score
-            object_score_dict[index_name] = [tmp_score,names[index_name+'_score']]
-            res.append(tmp_score)
-        elif index_name == 'acc_GCSX_' and index_name in index_dic.keys() and index_dic[index_name] == 1:
-            index_name = index_name.strip('_')
-            tmp_score, wenshu_corr, index_res = globals().get('%s' % index_name)(index, wenshu_corr)
-            object_score += tmp_score
-            object_score_dict[index_name] = [tmp_score,names[index_name+'_score']]
-            res.append(tmp_score)
-        elif index_name in index_dic.keys():
-            index_name = index_name.strip('_')
-            tmp_score = names[index_name + '_score']
-            object_score += tmp_score
-            # object_score_dict[index_name] = tmp_score
-            res.append(tmp_score)
-        else:
-            index_name = index_name.strip('_')
-            tmp_score = names[index_name + '_score']
-            object_score += tmp_score
-            object_score_dict[index_name] = [tmp_score,names[index_name+'_score']]
+# index_dic 要检测指标，字典类型
 
-    print(object_score)
-    return object_score, wenshu_corr, object_score_dict, wenshu_content,index_res
+names = locals()
 
 
 def get_wenshu_content(wenshu):
@@ -835,84 +787,124 @@ def get_wenshu_content(wenshu):
         if len(wenshu[i]) != 0:
             for node_i in range(len(wenshu[i])):
                 wenshu_content[i] += wenshu[i][node_i].get('value') + '\n'
-    wenshu['其他']='其他意见'
+    wenshu['其他'] = '其他意见'
     return wenshu_content
 
 
-if __name__ == '__main__':
-    filepath = 'D:/NJU/final_project/data/example/0.xml'
+def objective_measure(filepath, object_list, wenshu_corr):
+    object_score = 0
+    object_score_dict = {}
     xml_file = etree.parse(filepath)
     root_node = xml_file.getroot()[0]
-    # del_date(root_node)
-    # met_CSR(root_node)
-    wenshu_corr = {'文首': [], "首部": [], "事实": [], "理由": [], "依据": [], "主文": [], "尾部": [], '落款': [], '附件': [], '其他': {}}
     wenshu, index = wenshu_analysis(root_node)
-    # 单个函数测试
-    # aut_AY(root_node,wenshu_corr)
-    # aut_CPYJ(wenshu,wenshu_corr)
-    # con_pun(wenshu,wenshu_corr)
-    # rea_ZYJD(wenshu,wenshu_corr)
-    # acc_GCSX(index,wenshu_corr)
-    # acc_SLJG(wenshu,wenshu_corr)
-    # acc_CSR(wenshu,wenshu_corr)
-    # rea_SSMS(wenshu)
-    index_dic = {
-        "met_CSR_": 1,
-        "met_AJJBQK_": 1,
-        "met_CPFXGC_": 1,
-        "del_date_": 1,
-        "aut_AY_": 1,
-        "aut_CPYJ_": 1,
-        "com_PJNR_": 1,
-        "com_SFCD_": 1,
-        "con_num_": 1,
-        "con_pun_": 1,
-        "rea_SSMS_": 1,
-        "rea_ZYJD_": 1,
-        "acc_GCSX_": 1,
-        "acc_SLJG_": 1,
-        "acc_CSR_": 1}
-    object_index = {
-        "met_CSR_": 1,
-        "met_AJJBQK_": 1,
-        "met_CPFXGC_": 1,
-        "del_date_": 1,
-        "aut_AY_": 1,
-        "aut_CPYJ_": 1,
-        "com_PJNR_": 1,
-        "com_SFCD_": 1,
-        "con_num_": 1,
-        "con_pun_": 1,
-        "rea_SSMS_": 1,
-        "rea_ZYJD_": 1,
-        "acc_GCSX_": 1,
-        "acc_SLJG_": 1,
-        "acc_CSR_": 1}
+    wenshu_content = get_wenshu_content(wenshu)
+    res = []
+    index_res = []
+    for index_name in object_index.keys():
+        if index_name in object_list and index_name != 'del_date' and index_name != 'acc_GCSX':
+            tmp_score, wenshu_corr = globals().get('%s' % index_name)(wenshu, wenshu_corr)
+            print(tmp_score)
+            object_score_dict[index_name] = [tmp_score, names[index_name + '_score']]
+            # res.append(tmp_score)
+            object_score += tmp_score
+        elif index_name == 'del_date' and index_name in object_list:
+            tmp_score, wenshu_corr = globals().get('%s' % index_name)(root_node, wenshu_corr)
+            object_score += tmp_score
+            object_score_dict[index_name] = [tmp_score, names[index_name + '_score']]
+            res.append(tmp_score)
+        elif index_name == 'acc_GCSX' and index_name in object_list:
+            tmp_score, wenshu_corr, index_res = globals().get('%s' % index_name)(index, wenshu_corr)
+            object_score += tmp_score
+            object_score_dict[index_name] = [tmp_score, names[index_name + '_score']]
+            res.append(tmp_score)
+        else:
+            tmp_score = names[index_name + '_score']
+            object_score += tmp_score
+            # res.append(tmp_score)
+    print(object_score)
+    # object_score客观总分
+    # wenshu_corr文书每一段的详细错误说明
+    # wenshu_content 文书每一段落内容
+    # object_score_dict每个指标的具体得分
+    # index_res篇章完整性结果
+    return object_score, wenshu_corr, object_score_dict, wenshu_content, index_res
 
-    # # 100篇文章测试
-    # path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
-    # res_file = open('../../data/object1.csv', 'w', encoding='utf-8')
-    # count = 0
-    # tmp = []
-    # for path in path_file.readlines():
-    #     count += 1
-    #     if count > 101:
-    #         break
-    #     path = 'G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + path.strip()
-    #     print('待检测文书名称为：' + path)
-    #     object_score, wenshu_corr,object_score_dic,wenshu_content,index_res, res = objective_measure(path, index_dic, object_index, wenshu_corr)
-    #     print(object_score)
-    #     tmp.append(res)
-    #     res_file.write('\t'.join(str(res)) + '\n')
-    # c = np.array(tmp)
-    # mean = c.mean(axis=0)
-    # max = c.max(axis=0)
-    # min = c.min(axis=0)
-    # std = c.std(axis=0)
-    # print(mean)
-    # print(min)
-    # print(max)
-    # print(std)
+# if __name__ == '__main__':
+#     filepath = 'D:/NJU/final_project/data/example/0.xml'
+#     xml_file = etree.parse(filepath)
+#     root_node = xml_file.getroot()[0]
+#     # del_date(root_node)
+#     # met_CSR(root_node)
+#     wenshu_corr = {'文首': [], "首部": [], "事实": [], "理由": [], "依据": [], "主文": [], "尾部": [], '落款': [], '附件': [], '其他': {}}
+#     wenshu, index = wenshu_analysis(root_node)
+# 单个函数测试
+# aut_AY(root_node,wenshu_corr)
+# aut_CPYJ(wenshu,wenshu_corr)
+# con_pun(wenshu,wenshu_corr)
+# rea_ZYJD(wenshu,wenshu_corr)
+# acc_GCSX(index,wenshu_corr)
+# acc_SLJG(wenshu,wenshu_corr)
+# acc_CSR(wenshu,wenshu_corr)
+# rea_SSMS(wenshu)
+# index_dic = {
+#     "met_CSR_": 1,
+#     "met_AJJBQK_": 1,
+#     "met_CPFXGC_": 1,
+#     "del_date_": 1,
+#     "aut_AY_": 1,
+#     "aut_CPYJ_": 1,
+#     "com_PJNR_": 1,
+#     "com_SFCD_": 1,
+#     "con_num_": 1,
+#     "con_pun_": 1,
+#     "rea_SSMS_": 1,
+#     "rea_ZYJD_": 1,
+#     "acc_GCSX_": 1,
+#     "acc_SLJG_": 1,
+#     "acc_CSR_": 1,
+# }
+# object_index = {
+#     "met_CSR_": 1,
+#     "met_AJJBQK_": 1,
+#     "met_CPFXGC_": 1,
+#     "del_date_": 1,
+#     "aut_AY_": 1,
+#     "aut_CPYJ_": 1,
+#     "com_PJNR_": 1,
+#     "com_SFCD_": 1,
+#     "con_num_": 1,
+#     "con_pun_": 1,
+#     "rea_SSMS_": 1,
+#     "rea_ZYJD_": 1,
+#     "acc_GCSX_": 1,
+#     "acc_SLJG_": 1,
+#     "acc_CSR_": 1}
 
+# # 100篇文章测试
+# path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
+# res_file = open('../../data/object1.csv', 'w', encoding='utf-8')
+# count = 0
+# tmp = []
+# for path in path_file.readlines():
+#     count += 1
+#     if count > 101:
+#         break
+#     path = 'G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + path.strip()
+#     print('待检测文书名称为：' + path)
+#     object_score, wenshu_corr,object_score_dic,wenshu_content,index_res, res = objective_measure(path, index_dic, object_index, wenshu_corr)
+#     print(object_score)
+#     tmp.append(res)
+#     res_file.write('\t'.join(str(res)) + '\n')
+# c = np.array(tmp)
+# mean = c.mean(axis=0)
+# max = c.max(axis=0)
+# min = c.min(axis=0)
+# std = c.std(axis=0)
+# print(mean)
+# print(min)
+# print(max)
+# print(std)
 
-    object_score, wenshu_corr, object_score_dic, wenshu_content,index_res= objective_measure(filepath, index_dic, object_index, wenshu_corr)
+# object_score, wenshu_corr, object_score_dic, wenshu_content, index_res = objective_measure(filepath, index_dic,
+#                                                                                            object_index,
+#                                                                                            wenshu_corr)

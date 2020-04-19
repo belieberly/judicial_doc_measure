@@ -4,9 +4,12 @@ import re
 
 import requests
 #
-from utils.SVC.comment_predict import svm_predict,svm_predict1
-def get_sentiment_result(text):
+from utils.SVC.comment_predict import svm_predict, svm_predict1
 
+import config as cf
+
+
+def get_sentiment_result(text):
     """
     利用情感倾向分析API来获取返回数据
     :param text: 输入文本
@@ -26,9 +29,9 @@ def get_sentiment_result(text):
     }
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
     response = requests.post(url=url, params=params, headers=headers).json()
-#
+    #
     access_token = response['access_token']
-     # 通用版情绪识别接口
+    # 通用版情绪识别接口
     url = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/sentiment_classify'
     # 定制版情绪识别接口
     # url = 'https://aip.baidubce.com/rpc/2.0/nlp/v1/sentiment_classify_custom'
@@ -43,40 +46,44 @@ def get_sentiment_result(text):
     response = requests.post(url=url, params=params, data=payload, headers=headers).json()
     return response
 
+
 def sentiment_index(str):
     pattern = r'，|。|；|：'
     sentence_list1 = re.split(pattern, str)
     sentiment_res = []
-    sentiment_score = 0
     for sentence in sentence_list1:
         # res = get_sentiment_result(sentence)['items'][0]
         # positive_porb = res['positive_prob']
         # # negative_prob = res['negative_prob']
         # confidence = res['confidence']
-        if len(sentence.strip())>1:
-            positive_porb,negative_prob= svm_predict(sentence)
+        if len(sentence.strip()) > 1:
+            positive_porb, negative_prob = svm_predict(sentence)
 
             # sentence_score = abs(positive_porb-negative_prob)*confidence
-            sentiment_res.append((sentence,abs(positive_porb-0.5)))
+            sentiment_res.append((sentence, abs(positive_porb - 0.5)))
     return sentiment_res
+
 
 def sentiment_index1(str):
     pattern = r'(，|。|；|：)'
     sentence_list1 = re.split(pattern, str)
     sentiment_res = []
-    sentiment_score = 0
+    count = 0
     for sentence in sentence_list1:
         # res = get_sentiment_result(sentence)['items'][0]
         # positive_porb = res['positive_prob']
         # # negative_prob = res['negative_prob']
         # confidence = res['confidence']
-        if len(sentence.strip())>1:
-            positive_porb,negative_prob= svm_predict1(sentence)
-
+        if len(sentence.strip()) > 1:
+            positive_porb, negative_prob = svm_predict1(sentence)
+            if positive_porb < cf.text_style_classify_threshold:
+                sentiment = cf.text_style_classify_threshold - positive_porb
+                count += 1
+            else:
+                sentiment = 0
             # sentence_score = abs(positive_porb-negative_prob)*confidence
-            sentiment_res.append((sentence,positive_porb))
-    return sentiment_res
-
+            sentiment_res.append((sentence, sentiment))
+    return sentiment_res, count
 
 
 if __name__ == '__main__':
@@ -89,5 +96,3 @@ if __name__ == '__main__':
     # negative_prob = res['negative_prob']
     confidence = res['confidence']
     print(res)
-
-

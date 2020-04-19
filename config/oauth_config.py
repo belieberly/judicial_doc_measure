@@ -1,0 +1,10 @@
+expires_time = 360000
+secret_key = 'my secret'
+token_type = 'Bearer'
+oauth_url = 'http://api.mooctest.net/oauth/token'
+oauth_token_type = 'Basic'
+oauth_token = 'TW9vY3Rlc3REYXRhQXNzZXNzbWVudDpNb29jdGVzdERhdGFBc3Nlc3NtZW50'
+oauth_grant_type = 'authorization_code'
+oauth_redirect_uri = 'http://mooctest.whiskychoy.com/auth/mooctest/callback'
+oauth_scope = 'read'
+user_url = 'http://api.mooctest.net/oauth/api/user'

@@ -1,190 +1,142 @@
-import datetime
-from flasgger import swag_from
-from flask import Blueprint, request, jsonify
-from database.models import db, User, JudicialDoc, Report,Config
+# from flasgger import swag_from
+from flask import Blueprint, request, jsonify, g
+from database.models import db, User, JudicialDoc
 import config as cf
 import zipfile
 import uuid
 import json
 import web_utils
-from my_celery_client import my_celery_app
+from auth import auth
+import time
+from sqlalchemy.sql import and_, True_
 
 blueprint_writ = Blueprint('writ', __name__)
 
 
 # 上传单个zip文件或多个xml文件
 # 返回字符串格式，文件名称用逗号隔开
-@blueprint_writ.route('/upload', methods=['POST'])
-@swag_from('../api_description/upload.yml')
+@blueprint_writ.route('', methods=['POST', 'GET'])
+@auth.login_required
+# @cross_origin(origin='http://localhost:5500')
 def upload_file():
-    # db.drop_all()
-    db.create_all()
-    user = User(username='01', password='123456')
-    config_path = open(cf.transfer_config_path,'r',encoding = 'utf-8')
-    config_str = json.dumps(json.load(config_path),ensure_ascii=False)
-    config = Config(user_id=1,config_json=config_str)
-    db.session.add(user)
-    db.session.add(config)
-    db.session.commit()
-
-    basepath = cf.upload_base_dir
-    file_list = request.files.getlist('file')
-    # upload_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-    upload_time = datetime.datetime.now()
-    res = []
-    if len(file_list) == 0:
-        print('no file upload')
-        return ','.join(res)
-    elif len(file_list) == 1:
-        print('上传一个文件')
-        file_type = file_list[0].filename.split('.')[-1]
-        if file_type == 'zip':
-            zf = zipfile.ZipFile(file_list[0])
-            print(zf.namelist())
-            for name in zf.namelist():
-                if name.split('.')[-1] != 'xml':
+    def post():
+        basepath = cf.upload_base_dir
+        file_list = request.files.getlist('file')
+        # upload_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        upload_time = time.time()
+        upload_time = web_utils.timestamp2time(upload_time)
+        res = []
+        if len(file_list) == 0:
+            print('no file upload')
+            return ','.join(res)
+        elif len(file_list) == 1:
+            print('upload one file successfully')
+            file_type = file_list[0].filename.split('.')[-1]
+            if file_type == 'zip':
+                zf = zipfile.ZipFile(file_list[0])
+                # print(zf.namelist())
+                for name in zf.namelist():
+                    if name.split('.')[-1] != 'xml':
+                        continue
+                    else:
+                        tmp_uuid = str(uuid.uuid4())
+                        upload_path = basepath + tmp_uuid + name.split('/')[-1]
+                        # print(upload_path)
+                        hFile = open(upload_path, 'wb')
+                        file_bytes = zf.read(name)
+                        file_length = len(file_bytes)
+                        hFile.write(file_bytes)
+                        hFile.close()
+                        doc = JudicialDoc(id=tmp_uuid, user_id=g.user['open_id'], docname=name, date=upload_time,
+                                          check_status='untested', length=file_length, loc=upload_path)
+                        db.session.add(doc)
+                        db.session.commit()
+                        res.append(name)
+                return json.dumps(res)
+            elif file_type == 'xml':
+                print('文件类型为xml')
+                tmp_uuid = str(uuid.uuid4())
+                name = file_list[0].filename
+                upload_path = basepath + tmp_uuid + '_' + name
+                file2save = open(upload_path, 'wb')
+                tmp_file = file_list[0]
+                file_bytes = tmp_file.read()
+                tmp_length = len(file_bytes)
+                file2save.write(file_bytes)
+                print('保存成功')
+                doc = JudicialDoc(id=tmp_uuid, user_id=g.user['open_id'], docname=name, date=upload_time,
+                                  check_status='untested', length=tmp_length, loc=upload_path)
+                db.session.add(doc)
+                db.session.commit()
+                res.append(name)
+                return json.dumps(res)
+            else:
+                return json.dumps(res)
+        else:
+            for file in file_list:
+                name = file.filename
+                file_type = name.split('.')[-1]
+                if file_type != 'xml':
                     continue
                 else:
                     tmp_uuid = str(uuid.uuid4())
-                    upload_path = basepath + tmp_uuid + name.split('/')[-1]
-                    print(upload_path)
-                    hFile = open(upload_path, 'wb')
-                    hFile.write(zf.read(name))
-                    hFile.close()
-                    doc = JudicialDoc(id=tmp_uuid, user_id=web_utils.get_userid(), docname=name, date=upload_time,
+                    # upload_path = os.path.join(basepath,filename)
+                    upload_path = basepath + tmp_uuid + '_' + name
+                    file.save(upload_path)
+                    print('保存成功')
+                    doc = JudicialDoc(id=tmp_uuid, user_id=g.user['open_id'], docname=name, date=upload_time,
                                       check_status='untested', length=0, loc=upload_path)
                     db.session.add(doc)
                     db.session.commit()
                     res.append(name)
             return json.dumps(res)
-        elif file_type == 'xml':
-            print('文件类型为xml')
-            tmp_uuid = str(uuid.uuid4())
-            name = file_list[0].filename
-            # upload_path = os.path.join(basepath,filename)
-            upload_path = basepath + tmp_uuid + '_' + name
-            file_list[0].save(upload_path)
-            print('保存成功')
-            doc = JudicialDoc(id=tmp_uuid, user_id=web_utils.get_userid(), docname=name, date=upload_time,
-                              check_status='untested', length=0, loc=upload_path)
-            db.session.add(doc)
-            db.session.commit()
-            res.append(name)
-            return json.dumps(res)
+
+    def get():
+        user_id = g.user['open_id']
+        doc_list = []
+        condition = (JudicialDoc.user_id == user_id)
+        if request.values.get('taskId'):
+            condition = and_(condition, JudicialDoc.task_id == request.values.get('taskId'))
+        if request.values.get('name'):
+            condition = and_(condition, JudicialDoc.docname.like('%' + request.values.get('name') + '%'))
+        if request.values.get('startTime'):
+            start_timestamp = request.values.get('startTime')
+            start_time = web_utils.timestamp2time(int(start_timestamp) / 1000)
+            condition = and_(condition, JudicialDoc.date > start_time)
+        if request.values.get('endTime'):
+            end_timestamp = request.values.get('endTime')
+            end_time = web_utils.timestamp2time(int(end_timestamp) / 1000)
+            condition = and_(condition, JudicialDoc.date < end_time)
+        if request.values.get('status'):
+            status = request.values.get('status')
+            condition = and_(condition, JudicialDoc.check_status == status)
+        docs_operator = JudicialDoc.query.filter(condition)
+        if request.values.get('pageIndex'):
+            page_index = int(request.values.get('pageIndex'))
         else:
-            return json.dumps(res)
+            page_index = 1
+        if request.values.get('pageSize'):
+            page_size = int(request.values.get('pageSize'))
+        else:
+            page_size = None
+        total_len = docs_operator.count()
+        docs = docs_operator.paginate(page=page_index, per_page=page_size).items
+        for doc in docs:
+            doc_tmp = {'id': doc.id, 'title': doc.docname, 'time': web_utils.time2timestamp(doc.date) * 1000,
+                       'length': doc.length,
+                       'status': doc.check_status}
+            doc_list.append(doc_tmp)
+        res = {'result': doc_list, 'total': total_len}
+        return jsonify(res)
+
+    if request.method == 'POST':
+        return post()
     else:
-        for file in file_list:
-            name = file.filename
-            file_type = name.split('.')[-1]
-            if file_type != 'xml':
-                continue
-            else:
-                tmp_uuid = str(uuid.uuid4())
-                # upload_path = os.path.join(basepath,filename)
-                upload_path = basepath + tmp_uuid + '_' + name
-                file.save(upload_path)
-                print('保存成功')
-                doc = JudicialDoc(id=tmp_uuid, user_id=web_utils.get_userid(), docname=name, date=upload_time,
-                                  check_status='untested', length=0, loc=upload_path)
-                db.session.add(doc)
-                db.session.commit()
-                res.append(name)
-        return json.dumps(res)
+        return get()
 
 
-# # get取配置项 post写配置项
-# @blueprint_writ.route('/config', methods=['GET', 'POST'])
-# def set_config():
-#     if request.method == 'GET':
-#         user_id = web_util.get_userid()
-#         User.query.filter_by(id=user_id).first()
-#         request.get_json()
-#     return
-
-
-@blueprint_writ.route('/writ_list', methods=['GET'])
-@swag_from('../api_description/get_list.yml')
-def get_writ_list():
-    # db.drop_all()
-    # db.create_all()
-    # user = User(username='01', password='123456')
-    # db.session.add(user)
-    # db.session.commit()
-    user_id = web_utils.get_userid()
-    print(user_id)
-    user = User.query.get(user_id)
-    # print(user)
-    doc_list = []
-    if request.values.get('name'):
-        docs = user.docs.filter(JudicialDoc.docname.like('%' + request.values.get('name') + '%'))
-        # print(docs)
-    if request.values.get('startTime'):
-        print('开始时间')
-        start_timestamp = request.values.get('startTime')
-        print('获取时间戳：', start_timestamp)
-        start_time = web_utils.timestamp2time(int(start_timestamp))
-        print(start_time)
-        docs = docs.filter(JudicialDoc.date > start_time)
-    if request.values.get('endTime'):
-        print('结束时间')
-        end_timestamp = request.values.get('endTime')
-        print('获取时间戳：', end_timestamp)
-        end_time = web_utils.timestamp2time(int(end_timestamp))
-        print(end_time)
-        docs = docs.filter(JudicialDoc.date < end_time)
-    if not (request.values.get('name') or request.values.get('startTime') or request.values.get('endTime')):
-        docs = user.docs.all()
-        # print(docs)
-    for doc in docs:
-        doc_tmp = {'id': doc.id, 'name': doc.docname, 'time': doc.date, 'length': doc.length,
-                   'status': doc.check_status}
-        doc_list.append(doc_tmp)
-    return jsonify({'doc_list': doc_list})
-
-
-# @blueprint_writ.route('./writ_report/<writ_id>',methods = ['GET'])
-@blueprint_writ.route('/writ_report', methods=['GET'])
-# @swag_from('../api_description/get_writ_report.yml')
-def get_writ_report():
-    writ_id = request.values.get('writ-id')
-    print(writ_id)
-    report = Report.query.filter_by(doc_id=writ_id).first()
-    report_file = open(report.loc, 'r', encoding='utf-8')
-    report_json = json.load(report_file)
-    return report_json
-
-
-@blueprint_writ.route('/doc_measure', methods=['GET'])
-@swag_from('../api_description/get_writ_report.yml')
-def doc_measure():
-    writ_id = request.values.get('writ-id')
-    print(writ_id)
-    input_index_dic = {
-        "met_CSR_": 1,
-        "met_AJJBQK_": 1,
-        "met_CPFXGC_": 1,
-        "del_date_": 1,
-        "aut_AY_": 1,
-        "aut_CPYJ_": 1,
-        "com_PJNR_": 1,
-        "com_SFCD_": 1,
-        "con_num_": 1,
-        "con_pun_": 1,
-        "rea_SSMS_": 1,
-        "rea_ZYJD_": 1,
-        "acc_GCSX_": 1,
-        "acc_SLJG_": 1,
-        "acc_CSR_": 1,
-        "text_style_classification_": 1,
-        "sentiment_index_": 1,
-        "copy_detect_index_": 1,
-        "law_articles_rational_": 1
-    }
-    try:
-        # _thread.start_new_thread(doc_measure_thread,(writ_id,input_index_dic))
-        print('celery啥时候调度啊')
-        my_celery_app.send_task('doc_measure_thread', args=[writ_id, input_index_dic])
-    except:
-        print('无法启动线程')
-    return '后端开始检测'
+@blueprint_writ.route('/<writ_id>/status', methods=['GET'])
+@auth.login_required
+def get_writ_status(writ_id):
+    writ = JudicialDoc.query.filter_by(id=writ_id).first()
+    return writ.check_status

@@ -11,8 +11,12 @@ DevConfig = {
     'CELERY_RESULT_BACKEND': 'redis://localhost:6379/0'
 }
 
-usr_cwd = 'E:/pycharm/judicial_doc_measurement'
+api_allow_origins = ['http://mooctest.whiskychoy.com', 'http://localhost:5500',
+                     'http://assess.ngrok.whiskychoy.com:8081']
+
+usr_cwd = 'E:/pycharm/judicial_doc_measurement/'
 web_data_path = os.path.join(usr_cwd, 'web_data')
+# web_data_path = 'static/web_data'
 # 上传文件默认路径
 upload_base_dir = web_data_path + '/upload_files/'
 
@@ -52,6 +56,27 @@ index = {'met_CSR': '参诉人信息细致性', 'met_AJJBQK': '事实部分细�
          'text_style_classification': '语言风格鲜明性', 'sentiment_index': '客观程度',
          'copy_detect_index': '语言抄袭检测', 'law_articles_rational': '法条合理性'}
 
+object_index = {"met_CSR": 1,
+                "met_AJJBQK": 1,
+                "met_CPFXGC": 1,
+                "del_date": 1,
+                "aut_AY": 1,
+                "aut_CPYJ": 1,
+                "com_PJNR": 1,
+                "com_SFCD": 1,
+                "con_num": 1,
+                "con_pun": 1,
+                "rea_SSMS": 1,
+                "rea_ZYJD": 1,
+                "acc_GCSX": 1,
+                "acc_SLJG": 1,
+                "acc_CSR": 1}
+subject_index = {"text_style_classification": 1,
+                 "sentiment_index": 1,
+                 "copy_detect_index": 1,
+                 "law_articles_rational": 1
+                 }
+
 standard_value = {'met_CSR': 4.9, 'met_AJJBQK': 4.9, 'met_CPFXGC': 4.45,
                   'del_date': 3.69, 'aut_AY': 4.82, 'aut_CPYJ': 5,
                   'com_PJNR': 2.89, 'com_SFCD': 3.17, 'con_num': 9.75,
@@ -60,7 +85,7 @@ standard_value = {'met_CSR': 4.9, 'met_AJJBQK': 4.9, 'met_CPFXGC': 4.45,
                   'text_style_classification': 5.2, 'sentiment_index': 9.2,
                   'copy_detect_index': 9.44, 'law_articles_rational': 20}
 
-index_cat = {'met': '细致性', 'del': '延迟性', 'aut': '真实性', 'com': '完整性', 'con': '一致性', 'rea': '易读性', 'acc': '完整性'}
+index_cat = {'met': '细致性', 'del': '延迟性', 'aut': '真实性', 'com': '完整性', 'con': '一致性', 'rea': '易读性', 'acc': '准确性'}
 # 细致性阈值
 met_CSR_threshold = 7
 met_AJJBQK_threshold = 5
@@ -88,7 +113,7 @@ sentiment_classify_fault = 5
 # 文书风格分项总分
 text_style_classify_score = 25
 # 文书风格单句阈值
-text_style_classify_threshold = 0.8
+text_style_classify_threshold = 1
 # 文书风格单句扣分
 text_style_classify_fault = 5
 
