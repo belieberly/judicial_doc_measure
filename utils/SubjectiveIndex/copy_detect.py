@@ -55,8 +55,7 @@ def find_max(number, list_):
     return list(re1), re2
 
 
-
-#主函数
+# 主函数
 # str1为原告/被告诉称段，str2为查明事实段
 def long_detect(str1, str2):
     pattern = r'，|。|；|：'
@@ -89,12 +88,15 @@ def long_detect(str1, str2):
     for i in range(len(sim_list)):
         if sim_list[i] > cf.copy_detect_threshold:
             res.append('<' + res1[i] + '>与<' + res2[i] + '>相似')
-    if len(res) == 0:
+    if len(res) < len(sentence_list1) * 0.2:
         return cf.copy_detect_score, ''
-    elif len(res) > 4:
+    elif len(res) > len(sentence_list1) * 0.8:
         return 0, ','.join(res)
     else:
-        return cf.copy_detect_score - cf.copy_detect_fault * len(res), ','.join(res)
+        score = cf.copy_detect_score - cf.copy_detect_fault * len(res)
+        if score < 0:
+            score = 0
+        return score, ','.join(res)
 
 
 if __name__ == '__main__':

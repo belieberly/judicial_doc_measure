@@ -128,7 +128,7 @@ def acc_SLJG(wenshu, wenshu_corr):
                 if subnode.tag == 'KTRQ':
                     index_SLJG[1] = SSJL_txt.find('开庭')
                 # 适用程序
-                if '适用程序' in subnode.get('nameCN'):
+                if '程序' in subnode.get('nameCN'):
                     index_SLJG[2] = SSJL_txt.find(subnode.get('value'))
                 # 出庭当事人信息
                 if subnode.tag == 'CTDSRXX':
@@ -166,7 +166,7 @@ def con_pun_DSR(DSR_txt, wenshu_corr):
             res_score -= 1
     if re.match(r'^[\u4e00-\u9fa5]{0,6}人.*', DSR_txt):
         if DSR_txt[DSR_txt.index('人') + 1] != '：':
-            wenshu_corr['首部'].append('标点符号：' + DSR_txt + '原告后应为冒号')
+            wenshu_corr['首部'].append('标点符号：' + DSR_txt + '其他诉讼参与人后应为冒号')
             res_score -= 1
     return res_score, wenshu_corr
 
@@ -239,7 +239,7 @@ def acc_CSR(wenshu, wenshu_corr):
 # 对于过长的段落应该提示读者不应过长，但是怎么设定阈值未知
 def con_pun_YGSCD(YGSCD_txt, wenshu_corr):
     res_score = 0
-    pun_mao = [i.end() for i in re.finditer(r'.*原告(向本院提出)*诉讼请求(如下)*', YGSCD_txt)]
+    pun_mao = [i.end() for i in re.finditer(r'.*原告[\u4e00-\u9fa5]{0,4}(向本院提出)*诉讼请求*(如下)*', YGSCD_txt)]
     for i in pun_mao:
         if YGSCD_txt[i] != '：':
             wenshu_corr['事实'].append('标点符号：原告诉讼请求后应为冒号')
@@ -249,10 +249,10 @@ def con_pun_YGSCD(YGSCD_txt, wenshu_corr):
 
 def con_pun_BGBCD(BGBCD_txt, wenshu_corr):
     res_score = 0
-    pun_mao = [i.end() for i in re.finditer(r'.*被告辩称(如下)*', BGBCD_txt)]
+    pun_mao = [i.end() for i in re.finditer(r'.*被告[\u4e00-\u9fa5]{0,4}辩称(如下)*', BGBCD_txt)]
     for i in pun_mao:
-        if BGBCD_txt[i] != '：':
-            wenshu_corr['事实'].append('标点符号：被告辩称后应为冒号')
+        if BGBCD_txt[i] != '，':
+            wenshu_corr['事实'].append('标点符号：被告辩称后应为逗号')
             res_score -= 1
     return res_score, wenshu_corr
 
@@ -286,9 +286,10 @@ def con_pun(wenshu, wenshu_corr):
             CMSSD_txt = node.get('value')
             tmp_score, wenshu_corr = con_pun_CMSSD(CMSSD_txt, wenshu_corr)
             res_score += tmp_score
-    CPFXGC_txt = wenshu['理由'][0].get('value')
-    tmp_score, wenshu_corr = con_pun_CPFXGC(CPFXGC_txt, wenshu_corr)
-    res_score += tmp_score
+    if len(wenshu['理由'])!=0:
+        CPFXGC_txt = wenshu['理由'][0].get('value')
+        tmp_score, wenshu_corr = con_pun_CPFXGC(CPFXGC_txt, wenshu_corr)
+        res_score += tmp_score
     PJJG_node = wenshu['主文'][0]
     PJJG_txt = PJJG_node.get('value')
     tmp_score, wenshu_corr = con_pun_PJJG(PJJG_txt, wenshu_corr)
@@ -301,7 +302,7 @@ def con_pun(wenshu, wenshu_corr):
                 tmp_score, wenshu_corr = con_pun_DSR(DSR_txt, wenshu_corr)
                 res_score += tmp_score
     res_score = res_score + cf.con_pun_score
-    if (res_score) < 0:
+    if res_score < 0:
         res_score = 0
     return res_score, wenshu_corr
 
@@ -452,11 +453,14 @@ def com_PJNR(wenshu, wenshu_corr):
                     for i in range(4):
                         if index_PJNR[i] == -1:
                             wenshu_corr['主文'].append('判决内容说明完整性' + PJJGNR_txt + '中缺少' + standard_PJNR[i])
+                            res_score-=1
         if flag_ == 1 and not (
-                re.match(r'.*如果未按本判决指的期间履行金钱给付义务，应当按照《中华人民共和国民事诉讼法》第二百五十三条的规定，加倍支付延迟履行期间的债务利息.*', PJJG_txt)):
+                re.match(r'.*应当按照《中华人民共和国民事诉讼法》第二百五十三条的规定，加倍支付延迟履行期间的债务利息.*', PJJG_txt)):
             wenshu_corr['主文'].append('判决结果告知缺失')
-        else:
-            res_score += cf.com_PJNR_score
+            res_score-=2
+        res_score += cf.com_PJNR_score
+        if res_score<0:
+            res_score = 0
         return res_score, wenshu_corr
     else:
         return res_score, wenshu_corr
@@ -791,6 +795,10 @@ def get_wenshu_content(wenshu):
     return wenshu_content
 
 
+# filepath: 文书路径
+# object_list:使用到的客观指标列表
+# wenshu_corr：文书修改建议字典
+
 def objective_measure(filepath, object_list, wenshu_corr):
     object_score = 0
     object_score_dict = {}
@@ -805,7 +813,7 @@ def objective_measure(filepath, object_list, wenshu_corr):
             tmp_score, wenshu_corr = globals().get('%s' % index_name)(wenshu, wenshu_corr)
             print(tmp_score)
             object_score_dict[index_name] = [tmp_score, names[index_name + '_score']]
-            # res.append(tmp_score)
+            res.append(tmp_score)
             object_score += tmp_score
         elif index_name == 'del_date' and index_name in object_list:
             tmp_score, wenshu_corr = globals().get('%s' % index_name)(root_node, wenshu_corr)
@@ -820,7 +828,7 @@ def objective_measure(filepath, object_list, wenshu_corr):
         else:
             tmp_score = names[index_name + '_score']
             object_score += tmp_score
-            # res.append(tmp_score)
+            res.append(tmp_score)
     print(object_score)
     # object_score客观总分
     # wenshu_corr文书每一段的详细错误说明
@@ -828,6 +836,45 @@ def objective_measure(filepath, object_list, wenshu_corr):
     # object_score_dict每个指标的具体得分
     # index_res篇章完整性结果
     return object_score, wenshu_corr, object_score_dict, wenshu_content, index_res
+
+def objective_measure1(filepath, object_list, wenshu_corr):
+    object_score = 0
+    object_score_dict = {}
+    xml_file = etree.parse(filepath)
+    root_node = xml_file.getroot()[0]
+    wenshu, index = wenshu_analysis(root_node)
+    wenshu_content = get_wenshu_content(wenshu)
+    res = []
+    index_res = []
+    for index_name in object_index.keys():
+        if index_name in object_list and index_name != 'del_date' and index_name != 'acc_GCSX':
+            tmp_score, wenshu_corr = globals().get('%s' % index_name)(wenshu, wenshu_corr)
+            print(tmp_score)
+            object_score_dict[index_name] = [tmp_score, names[index_name + '_score']]
+            res.append(tmp_score)
+            object_score += tmp_score
+        elif index_name == 'del_date' and index_name in object_list:
+            tmp_score, wenshu_corr = globals().get('%s' % index_name)(root_node, wenshu_corr)
+            object_score += tmp_score
+            object_score_dict[index_name] = [tmp_score, names[index_name + '_score']]
+            res.append(tmp_score)
+        elif index_name == 'acc_GCSX' and index_name in object_list:
+            tmp_score, wenshu_corr, index_res = globals().get('%s' % index_name)(index, wenshu_corr)
+            object_score += tmp_score
+            object_score_dict[index_name] = [tmp_score, names[index_name + '_score']]
+            res.append(tmp_score)
+        else:
+            tmp_score = names[index_name + '_score']
+            object_score += tmp_score
+            res.append(tmp_score)
+    print(object_score)
+    # object_score客观总分
+    # wenshu_corr文书每一段的详细错误说明
+    # wenshu_content 文书每一段落内容
+    # object_score_dict每个指标的具体得分
+    # index_res篇章完整性结果
+    return object_score, wenshu_corr, object_score_dict, wenshu_content, index_res,res
+
 
 # if __name__ == '__main__':
 #     filepath = 'D:/NJU/final_project/data/example/0.xml'
@@ -880,31 +927,65 @@ def objective_measure(filepath, object_list, wenshu_corr):
 #     "acc_SLJG_": 1,
 #     "acc_CSR_": 1}
 
-# # 100篇文章测试
-# path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
-# res_file = open('../../data/object1.csv', 'w', encoding='utf-8')
-# count = 0
-# tmp = []
-# for path in path_file.readlines():
-#     count += 1
-#     if count > 101:
-#         break
-#     path = 'G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + path.strip()
-#     print('待检测文书名称为：' + path)
-#     object_score, wenshu_corr,object_score_dic,wenshu_content,index_res, res = objective_measure(path, index_dic, object_index, wenshu_corr)
-#     print(object_score)
-#     tmp.append(res)
-#     res_file.write('\t'.join(str(res)) + '\n')
-# c = np.array(tmp)
-# mean = c.mean(axis=0)
-# max = c.max(axis=0)
-# min = c.min(axis=0)
-# std = c.std(axis=0)
-# print(mean)
-# print(min)
-# print(max)
-# print(std)
+def test_object_time():
+    # 100篇文章测试
+    object_list = ["met_CSR",
+                   "met_AJJBQK",
+                   "met_CPFXGC",
+                   "del_date",
+                   "aut_AY",
+                   "aut_CPYJ",
+                   "com_PJNR",
+                   "com_SFCD",
+                   "con_num",
+                   "con_pun",
+                   "rea_SSMS",
+                   "rea_ZYJD",
+                   "acc_GCSX",
+                   "acc_SLJG",
+                   "acc_CSR"]
+    path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
+    res_file = open('../../data/object_tmp.csv', 'w', encoding='utf-8')
+    time_file = open('../../data/object_time_tmp.csv', 'w', encoding='utf-8')
+    count = 0
+    tmp = []
+    time_res = []
+    for path in path_file.readlines():
+        time_start = time.time()
+        count += 1
+        if count > 100:
+            break
+        path = 'G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + path.strip()
+        print('待检测文书名称为：' + path)
+        wenshu_corr = {'文首': [], "首部": [], "事实": [], "理由": [], "依据": [], "主文": [], "尾部": [], '落款': [], '附件': [],
+                       '其他': {}}
+        object_score, wenshu_corr, object_score_dic, wenshu_content, index_res, res = objective_measure1(path,
+                                                                                                        object_list,
+                                                                                                        wenshu_corr)
+        print(object_score)
+        # tmp.append(res)
+        res.append(str(object_score))
+        res.append(path.split('/')[-1])
+        res.append(str(object_score_dic))
+        res_file.write('\t'.join(str(res)) + '\n')
+        time_end = time.time()
+        cost = time_end - time_start
+        time_res.append(cost)
+        # time_file.write(str(cost)+'\n')
+    # c = np.array(tmp)
+    # mean = c.mean(axis=0)
+    # max = c.max(axis=0)
+    # min = c.min(axis=0)
+    # std = c.std(axis=0)
+    # print(mean)
+    # print(min)
+    # print(max)
+    # print(std)
+    # print(time_res)
 
+#
+if __name__ == '__main__':
+    test_object_time()
 # object_score, wenshu_corr, object_score_dic, wenshu_content, index_res = objective_measure(filepath, index_dic,
 #                                                                                            object_index,
 #                                                                                            wenshu_corr)

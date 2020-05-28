@@ -131,14 +131,6 @@ def doc_measure(filepath, input_index_dic):
     return json_res, province, writ_date
 
 
-# 多个文书
-# def docs_measure(filepath_list,input_index_dict):
-#     reports = []
-#     for filepath in filepath_list:
-#         report = {}
-#         json_res,province,writ_date = doc_measure(filepath,input_index_dict)
-#         report['json']=json_res
-#         report['']
 
 #
 # if __name__ == '__main__':

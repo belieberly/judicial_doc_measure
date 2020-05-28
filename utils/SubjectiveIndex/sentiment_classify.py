@@ -48,41 +48,43 @@ def get_sentiment_result(text):
 
 
 def sentiment_index(str):
-    pattern = r'，|。|；|：'
-    sentence_list1 = re.split(pattern, str)
-    sentiment_res = []
-    for sentence in sentence_list1:
-        # res = get_sentiment_result(sentence)['items'][0]
-        # positive_porb = res['positive_prob']
-        # # negative_prob = res['negative_prob']
-        # confidence = res['confidence']
-        if len(sentence.strip()) > 1:
-            positive_porb, negative_prob = svm_predict(sentence)
-
-            # sentence_score = abs(positive_porb-negative_prob)*confidence
-            sentiment_res.append((sentence, abs(positive_porb - 0.5)))
+    # pattern = r'，|。|；|：'
+    # sentence_list1 = re.split(pattern, str)
+    # sentiment_res = []
+    # for sentence in sentence_list1:
+    #     # res = get_sentiment_result(sentence)['items'][0]
+    #     # positive_porb = res['positive_prob']
+    #     # # negative_prob = res['negative_prob']
+    #     # confidence = res['confidence']
+    #     if len(sentence.strip()) > 1:
+    #         positive_porb, negative_prob = svm_predict(sentence)
+    #
+    #         # sentence_score = abs(positive_porb-negative_prob)*confidence
+    #         sentiment_res.append((sentence, abs(positive_porb - 0.5)))
+    sentiment_res = svm_predict(str)
     return sentiment_res
 
 
 def sentiment_index1(str):
-    pattern = r'(，|。|；|：)'
-    sentence_list1 = re.split(pattern, str)
-    sentiment_res = []
-    count = 0
-    for sentence in sentence_list1:
-        # res = get_sentiment_result(sentence)['items'][0]
-        # positive_porb = res['positive_prob']
-        # # negative_prob = res['negative_prob']
-        # confidence = res['confidence']
-        if len(sentence.strip()) > 1:
-            positive_porb, negative_prob = svm_predict1(sentence)
-            if positive_porb < cf.text_style_classify_threshold:
-                sentiment = cf.text_style_classify_threshold - positive_porb
-                count += 1
-            else:
-                sentiment = 0
-            # sentence_score = abs(positive_porb-negative_prob)*confidence
-            sentiment_res.append((sentence, sentiment))
+    # pattern = r'(，|。|；|：)'
+    # sentence_list1 = re.split(pattern, str)
+    # sentiment_res = []
+    # count = 0
+    # for sentence in sentence_list1:
+    #     # res = get_sentiment_result(sentence)['items'][0]
+    #     # positive_porb = res['positive_prob']
+    #     # # negative_prob = res['negative_prob']
+    #     # confidence = res['confidence']
+    #     if len(sentence.strip()) > 1:
+    #         positive_porb, negative_prob = svm_predict1(sentence)
+    #         if positive_porb < cf.text_style_classify_threshold:
+    #             sentiment = cf.text_style_classify_threshold - positive_porb
+    #             count += 1
+    #         else:
+    #             sentiment = 0
+    #         # sentence_score = abs(positive_porb-negative_prob)*confidence
+    #         sentiment_res.append((sentence, sentiment))
+    sentiment_res,count = svm_predict1(str)
     return sentiment_res, count
 
 

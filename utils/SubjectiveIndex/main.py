@@ -1,8 +1,12 @@
 # 实际上是线程
+import time
 from multiprocessing.dummy import Pool
 # 多进程
 # from multiprocessing import Pool
 from xml.etree import ElementTree as etree
+
+import numpy as np
+
 from utils.SubjectiveIndex.copy_detect import long_detect, levenshtein
 import config as cf
 from utils.SubjectiveIndex.sentiment_classify import sentiment_index as sentiment
@@ -89,27 +93,32 @@ def func_process(subject_score_dic, subject_score, process_res):
     sentiment_res = []
     text_style_res = []
     copy_detect_res = ''
+    res_list = []
     if 'copy_detect_index' in process_res.keys():
         score, res = process_res['copy_detect_index'].get()
         subject_score_dic['copy_detect_index'] = score
         subject_score += score
         copy_detect_res = res
+        res_list.append(score)
     if 'sentiment_index' in process_res.keys():
         score, res = process_res['sentiment_index'].get()
         subject_score_dic['sentiment_index'] = score
         subject_score += score
         sentiment_res = res
+        res_list.append(score)
     if 'text_style_classification' in process_res.keys():
         score, res = process_res['text_style_classification'].get()
         subject_score_dic['text_style_classification'] = score
         subject_score += score
         text_style_res = res
+        res_list.append(score)
     if 'law_articles_rational' in process_res.keys():
         score, res = process_res['law_articles_rational'].get()
         subject_score_dic['law_articles_rational'] = score
         subject_score += score
         law_articles_res = res
-    return law_articles_res, sentiment_res, text_style_res, copy_detect_res, subject_score_dic, subject_score
+        res_list.append(score)
+    return law_articles_res, sentiment_res, text_style_res, copy_detect_res, subject_score_dic, subject_score,res_list
 
 
 def subjective_measure(filepath, subject_list):
@@ -159,10 +168,12 @@ def subjective_measure(filepath, subject_list):
         print('law_article_index:', cf.law_articles_rational_score)
     pool.close()
     pool.join()
-    law_articles_res, sentiment_res, text_style_res, copy_detect_res, subject_score_dic, subject_score = func_process(
+    law_articles_res, sentiment_res, text_style_res, copy_detect_res, subject_score_dic, subject_score,res= func_process(
         subject_score_dic, subject_score, process_res)
 
     return subject_score, subject_score_dic, law_articles_res, sentiment_res, text_style_res, copy_detect_res
+
+
 #
 #
 # if __name__ == '__main__':
@@ -180,26 +191,86 @@ def subjective_measure(filepath, subject_list):
 #         "copy_detect_index_": 1,
 #         "law_articles_rational_": 1
 #     }
-#     path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
-#     res_file = open('../../data/subject.csv', 'w', encoding='utf-8')
-#     count = 0
-#     tmp = []
-#     for path in path_file.readlines():
-#         count += 1
-#         if count > 101:
-#             break
-#         path = 'G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + path.strip()
-#         print('待检测文书名称为：' + path)
-#         subject_score, wenshu_corr, subject_score_dic, law_articles_res, sentiment_res, text_style_res, copy_detect_res,res = subjective_measure(path, index_dic, subject_index, wenshu_corr)
-#         print(subject_score)
-#         tmp.append(res)
-#         res_file.write('\t'.join(str(res)) + '\n')
-#     c = np.array(tmp)
-#     mean = c.mean(axis=0)
-#     max = c.max(axis=0)
-#     min = c.min(axis=0)
-#     std = c.std(axis=0)
-#     print(mean)
-#     print(min)
-#     print(max)
-#     print(std)
+#
+
+
+def subjective_measure1(filepath, subject_list):
+    pool = Pool()
+    subject_score = 0
+    subject_score_dic = {}
+    xml_file = etree.parse(filepath)
+    root_node = xml_file.getroot()[0]
+    process_res = {}
+    logger.info('subject' + str(subject_list) + '!!!!!!!!!!!!!!')
+    if 'copy_detect_index' in subject_list:
+        process_res['copy_detect_index'] = pool.apply_async(copy_detect_index, (root_node,))
+    else:
+        subject_score += cf.copy_detect_score
+        print('copy_dect:', cf.copy_detect_score)
+    if 'sentiment_index' in subject_list:
+        process_res['sentiment_index'] = pool.apply_async(sentiment_index, (root_node,))
+    else:
+        subject_score += cf.sentiment_classify_score
+        print('sentiment_index:', cf.sentiment_classify_score)
+    if 'text_style_classification' in subject_list:
+        process_res['text_style_classification'] = pool.apply_async(text_style_classification, (root_node,))
+    else:
+        subject_score += cf.text_style_classify_score
+        print('text_style_classification:', cf.text_style_classify_score)
+    if 'law_articles_rational' in subject_list:
+        process_res['law_articles_rational'] = pool.apply_async(law_index, (filepath,))
+    else:
+        subject_score += cf.law_articles_rational_score
+        print('law_article_index:', cf.law_articles_rational_score)
+    pool.close()
+    pool.join()
+    law_articles_res, sentiment_res, text_style_res, copy_detect_res, subject_score_dic, subject_score,res= func_process(
+        subject_score_dic, subject_score, process_res)
+
+    return subject_score, subject_score_dic, law_articles_res, sentiment_res, text_style_res, copy_detect_res,res
+
+
+
+def subject_time():
+    path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
+    res_file = open('../../data/subject.csv', 'w', encoding='utf-8')
+    time_file = open('../../data/subject_time_tmp.csv', 'w', encoding='utf-8')
+    subject_list = {
+        "text_style_classification",
+        "sentiment_index",
+        "copy_detect_index",
+        "law_articles_rational",
+    }
+    count = 0
+    tmp = []
+    time_res = []
+    for path in path_file.readlines():
+        start_time = time.time()
+        count += 1
+        if count > 100:
+            break
+        path = 'G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + path.strip()
+        print('待检测文书名称为：' + path)
+        subject_score, subject_score_dic, law_articles_res, sentiment_res, text_style_res, copy_detect_res, res = subjective_measure1(path, subject_list)
+        tmp.append(res)
+        res.append(path.split('/')[-1])
+        res.append(str(subject_score))
+        res.append(str(subject_score_dic))
+        res_file.write('\t'.join(str(res)) + '\n')
+        end_time = time.time()
+        cost = end_time - start_time
+        time_res.append(cost)
+        time_file.write(str(cost) + '\n')
+    # c = np.array(tmp)
+    # mean = c.mean(axis=0)
+    # max = c.max(axis=0)
+    # min = c.min(axis=0)
+    # std = c.std(axis=0)
+    # print(mean)
+    # print(min)
+    # print(max)
+    # print(std)
+
+
+if __name__=='__main__':
+    subject_time()

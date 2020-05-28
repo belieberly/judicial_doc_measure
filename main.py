@@ -28,7 +28,7 @@ celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
 celery.conf.update(app.config)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(threaded=True)
     # 需要在App启动后再调用db
     db.drop_all()
     db.create_all()

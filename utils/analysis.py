@@ -54,12 +54,19 @@ def task_report(report_path_list, index_dic, task_name, tmp_task_uuid, task_date
         if len(task_report['avg_score']) == 0:
             for index in report_json['index_dic']:
                 index = index.strip('_')
-                task_report['avg_score'][index] = {'score': report_json['index_dic'][index][0],
-                                                   'metric': cf.index[index]}
+                try:
+                    task_report['avg_score'][index] = {'score': report_json['index_dic'][index][0],
+                                                       'metric': cf.index[index]}
+                except:
+                    task_report['avg_score'][index] = {'score': report_json['index_dic'][index],
+                                                       'metric': cf.index[index]}
         else:
             for index in report_json['index_dic']:
                 index = index.strip('_')
-                task_report['avg_score'][index]['score'] += report_json['index_dic'][index][0]
+                try:
+                    task_report['avg_score'][index]['score'] += report_json['index_dic'][index][0]
+                except:
+                    task_report['avg_score'][index]['score'] += report_json['index_dic'][index]
     province_dic = dic_convert(province_list)
     time_dic = dic_convert(writ_date_list)
     task_report['location_distribution'] = {'x_axis_data': list(province_dic.keys()),

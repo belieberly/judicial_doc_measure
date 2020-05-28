@@ -99,28 +99,28 @@ met_CPFXGC_score = 5
 # 抄袭检测分项总分
 copy_detect_score = 25
 # 抄袭检测相似度阈值
-copy_detect_threshold = 0.7
+copy_detect_threshold = 0.8
 # 抄袭检测每句扣分
-copy_detect_fault = 5
+copy_detect_fault = 2
 
 # 文书情感分项总分
 sentiment_classify_score = 25
 # 文书情感单句阈值
-sentiment_classify_threshold = 0.4
+sentiment_classify_threshold = 0.45
 # 情感单句扣分
-sentiment_classify_fault = 5
+sentiment_classify_fault = 2
 
 # 文书风格分项总分
 text_style_classify_score = 25
 # 文书风格单句阈值
-text_style_classify_threshold = 1
+text_style_classify_threshold = 0.9
 # 文书风格单句扣分
-text_style_classify_fault = 5
+text_style_classify_fault = 1
 
 # 文书法条相关性
 law_articles_rational_score = 25
 law_articles_rational_base = 10
-law_articles_rational_subscore = 5
+law_articles_rational_subscore = 3
 
 # 文书信息延迟性得分
 del_date_score = 10
