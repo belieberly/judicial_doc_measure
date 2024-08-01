@@ -36,23 +36,23 @@
 
 4. 安装依赖包
 
-   以下requirements.txt为3.6版本的
+   - 以下requirements.txt为3.6版本的
 
-   ```shell
-   pip install -r requirements.txt
-   ```
+      ```shell
+      pip install -r requirements.txt
+      ```
 
-   如果用3.5版本的，使用
+   - 如果用3.5版本的，使用
 
-   ```shell
-   pip install -r requirements_py35.txt
-   ```
+      ```shell
+      pip install -r requirements_py35.txt
+      ```
 
-   如果用3.6版本的 (和默认的一致)，使用
+   - 如果用3.6版本的 (和默认的一致)，使用
 
-   ```shell
-   pip install -r requirements_py36.txt
-   ```
+      ```shell
+      pip install -r requirements_py36.txt
+      ```
 
 5. 运行Python (独立Terminal)
 
