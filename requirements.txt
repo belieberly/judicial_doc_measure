@@ -39,8 +39,8 @@ PyYAML==5.3
 redis==2.10.6
 requests==2.23.0
 s3transfer==0.3.3
-scikit-learn==0.22.2.post1
-scipy==1.5.4                        # 1.4.1 will cause error
+scikit-learn==0.22.2.post1   # 0.24.2 too new
+scipy==1.5.4                 # 1.4.1 will cause error
 six==1.11.0
 sklearn==0.0
 smart-open==1.9.0
