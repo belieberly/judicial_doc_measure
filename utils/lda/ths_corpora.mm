@@ -1,5 +1,5 @@
 %%MatrixMarket matrix coordinate real general
-9627 95244 1309278                                
+9627 95244 1309278
 1 1 5
 1 2 2
 1 3 11

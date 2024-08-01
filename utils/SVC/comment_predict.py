@@ -3,16 +3,18 @@ import re
 import numpy as np
 from utils.SVC.preprocession import processing_word, get_stop_words
 from utils.SVC.comment_analysis import build_word_vector
-from gensim.models.word2vec import Word2Vec
-import joblib
+from gensim.models.word2vec import Word2Vec                     # type: ignore
+import joblib                                                   # type: ignore
 import config as cf
+from config import usr_cwd
+from sklearn.svm import SVC as SVCType
 
 
 # 载入word2vec和svm训练好的模型做预测
 def svm_predict(comment):
     n_dim = 300
-    svm_model = joblib.load('E:/pycharm/judicial_doc_measurement/utils/SVC/svm_model.pkl')
-    w2v_model = Word2Vec.load('E:/pycharm/judicial_doc_measurement/utils/SVC/w2v_model.pkl')
+    svm_model:SVCType = joblib.load(usr_cwd+'/utils/SVC/svm_model.pkl')
+    w2v_model = Word2Vec.load(usr_cwd+'/utils/SVC/w2v_model.pkl')
     stop_words_list = get_stop_words()
     pattern = r'，|。|；|：'
     sentence_list1 = re.split(pattern, comment)
@@ -40,8 +42,8 @@ def svm_predict(comment):
 
 def svm_predict1(comment):
     n_dim = 300
-    svm_model = joblib.load('E:/pycharm/judicial_doc_measurement/utils/SVC/svm_model1.pkl')
-    w2v_model = Word2Vec.load('E:/pycharm/judicial_doc_measurement/utils/SVC/w2v_model1.pkl')
+    svm_model:SVCType = joblib.load(usr_cwd+'/utils/SVC/svm_model1.pkl')
+    w2v_model = Word2Vec.load(usr_cwd+'/utils/SVC/w2v_model1.pkl')
     stop_words_list = get_stop_words()
     pattern = r'(，|。|；|：)'
     sentence_list1 = re.split(pattern, comment)
@@ -76,8 +78,8 @@ def split_cai(txt, strip):
 # 实验专用
 def svm_predict_cai(txt, strip):
     n_dim = 300
-    svm_model = joblib.load('E:/pycharm/judicial_doc_measurement/utils/SVC/svm_model1.pkl')
-    w2v_model = Word2Vec.load('E:/pycharm/judicial_doc_measurement/utils/SVC/w2v_model1.pkl')
+    svm_model:SVCType = joblib.load(usr_cwd+'/utils/SVC/svm_model1.pkl')
+    w2v_model = Word2Vec.load(usr_cwd+'/utils/SVC/w2v_model1.pkl')
     stop_words_list = get_stop_words()
     sentence_list1 = split_cai(txt, strip)
     sentiment_res = []
@@ -103,7 +105,7 @@ def svm_predict_cai(txt, strip):
 
 # strs = []
 # for i in range(1000):
-#     with open("D:/2000/pos/pos."+ str(i) +".txt", 'rt', encoding='utf-8') as f:  # 打开文件
+#     with open("somwhere/2000/pos/pos."+ str(i) +".txt", 'rt', encoding='utf-8') as f:  # 打开文件
 #         data = f.read()  # 读取文件
 #         strs.append(data.strip())
 #         print(str(i) + strs[i])

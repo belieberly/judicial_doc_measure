@@ -1,11 +1,11 @@
-import requests
+import requests                         # type: ignore
 import re
 import csv
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt         # type: ignore
 import numpy as np
-import pandas as pd
-import seaborn as sns
+# import pandas as pd
+import seaborn as sns                   # type: ignore
 
 
 def get_HTML(url):
@@ -23,8 +23,7 @@ def get_HTML(url):
 def get_path():
     page_list = []
     for i in range(2, 100):
-        url_catalog = 'http://www.mzyfz.com/cms/fazhixinwen/xinwenzhongxin/fazhijujiao/html/848/list-' + str(
-            i) + '.html'
+        url_catalog = 'http://www.mzyfz.com/cms/fazhixinwen/xinwenzhongxin/fazhijujiao/html/848/list-' + str(i) + '.html'
         catalog = get_HTML(url_catalog)
         # print(catalog)
         relink = '<a href="(.*)" target="_blank" title="'
@@ -92,8 +91,7 @@ def get_news(count):
 # for i in range(6000):
 #     get_news(i)
 
-import pandas as pd
-
+# import pandas as pd
 
 def confidenceinterval(data):  # 求置信区间
     StandardDeviation_sum = 0
@@ -120,55 +118,55 @@ def confidenceinterval(data):  # 求置信区间
     print('置信区间---------------')
 
 
-def plot_len():
-    full_txtf = open('../../data/full_news.csv', 'w', encoding='utf-8')
-    csv_writer = csv.writer(full_txtf, lineterminator='\n')
-    csv_writer.writerow(["标题", "内容"])
-    data_file = open('E:/pycharm/style_classification/train.csv', 'w', encoding='utf-8')
-    csv_writer1 = csv.writer(data_file, lineterminator='\n')
-    csv_writer1.writerow(["分类", "正文"])
-    len_ = []
-    for count in range(5000):
-        with open('../../data/news/' + str(count) + '.txt', 'r', encoding='utf-8') as inputf:
-            quanwen = ''
-            title = inputf.readline().strip()
-            for line in inputf.readlines():
-                line = re.sub('\n', '', line)
-                quanwen = quanwen + line
-            if 100 < len(quanwen) < 1000:
-                csv_writer.writerow([title, quanwen])
-                csv_writer1.writerow(['news', quanwen])
-                len_.append(len(quanwen))
-    confidenceinterval(len_)
-    # print(len_)
+# def plot_len():
+#     full_txtf = open('../../data/full_news.csv', 'w', encoding='utf-8')
+#     csv_writer = csv.writer(full_txtf, lineterminator='\n')
+#     csv_writer.writerow(["标题", "内容"])
+#     data_file = open('E:/pycharm/style_classification/train.csv', 'w', encoding='utf-8')
+#     csv_writer1 = csv.writer(data_file, lineterminator='\n')
+#     csv_writer1.writerow(["分类", "正文"])
+#     len_ = []
+#     for count in range(5000):
+#         with open('../../data/news/' + str(count) + '.txt', 'r', encoding='utf-8') as inputf:
+#             quanwen = ''
+#             title = inputf.readline().strip()
+#             for line in inputf.readlines():
+#                 line = re.sub('\n', '', line)
+#                 quanwen = quanwen + line
+#             if 100 < len(quanwen) < 1000:
+#                 csv_writer.writerow([title, quanwen])
+#                 csv_writer1.writerow(['news', quanwen])
+#                 len_.append(len(quanwen))
+#     confidenceinterval(len_)
+#     # print(len_)
 
-    # fig, axes = plt.subplots(2, 1)
-    # fig = plt.figure(figsize=(16, 5))
-    # x = [i for i in range(len(len_))]
-    # y = sorted(len_)
-    # data = pd.Series(y, x)
-    # data.plot.bar(ax=axes[0], color='k', alpha=0.7, rot=0)
-    # 参数alpha指定了所绘制图形的透明度，rot指定类别标签偏转的角度
+#     # fig, axes = plt.subplots(2, 1)
+#     # fig = plt.figure(figsize=(16, 5))
+#     # x = [i for i in range(len(len_))]
+#     # y = sorted(len_)
+#     # data = pd.Series(y, x)
+#     # data.plot.bar(ax=axes[0], color='k', alpha=0.7, rot=0)
+#     # 参数alpha指定了所绘制图形的透明度，rot指定类别标签偏转的角度
 
-    # data.plot.barh(ax=axes[1], color='k', alpha=0.7)
-    # Series.plot.barh()的用法与Series.plot.bar()一样，只不过绘制的条形图是水平方向的
-    # fig.savefig('p1.png')
-    # print(sorted(len_))
-    # 直方图
-    # plt.hist(len_, bins=30, normed=True, alpha=0.5, histtype='stepfilled', color='steelblue',
-    #          edgecolor='none')
-    # plt.show()
-    # # plt.axis([0,5000,0,0.0008])
-    # print(plt.axis())
+#     # data.plot.barh(ax=axes[1], color='k', alpha=0.7)
+#     # Series.plot.barh()的用法与Series.plot.bar()一样，只不过绘制的条形图是水平方向的
+#     # fig.savefig('p1.png')
+#     # print(sorted(len_))
+#     # 直方图
+#     # plt.hist(len_, bins=30, normed=True, alpha=0.5, histtype='stepfilled', color='steelblue',
+#     #          edgecolor='none')
+#     # plt.show()
+#     # # plt.axis([0,5000,0,0.0008])
+#     # print(plt.axis())
 
-    # volin图
-    dataset = len_
-    sns.violinplot(data=dataset)
-    plt.xlabel('Judicial News', fontsize=12)
-    plt.ylabel('Number of words in text', fontsize=12)
-    plt.title("Number of words in Judicial News", fontsize=15)
-    plt.show()
-    return len_
+#     # volin图
+#     dataset = len_
+#     sns.violinplot(data=dataset)
+#     plt.xlabel('Judicial News', fontsize=12)
+#     plt.ylabel('Number of words in text', fontsize=12)
+#     plt.title("Number of words in Judicial News", fontsize=15)
+#     plt.show()
+#     return len_
 
 
-plot_len()
+# plot_len()

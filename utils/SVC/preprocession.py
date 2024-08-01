@@ -1,8 +1,9 @@
 #预处理
 import numpy as np
-import pandas as pd
-import jieba
-from sklearn.model_selection import train_test_split
+import pandas as pd                                         # type: ignore
+import jieba                                                # type: ignore
+from sklearn.model_selection import train_test_split        # type: ignore
+from config import usr_cwd
 
 
 # 分词和去掉停用词
@@ -27,7 +28,7 @@ def processing_word(x, stop_words):
 
 def get_stop_words():
     stop_words_list = []
-    with open('E:/pycharm/judicial_doc_measurement/utils/SVC/stop_words.txt', 'r') as stop_words_file:
+    with open(usr_cwd+'/utils/SVC/stop_words.txt', 'r') as stop_words_file:
         for line in stop_words_file:
             stop_words_list.append(line.strip())
     return stop_words_list

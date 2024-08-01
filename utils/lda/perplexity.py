@@ -1,6 +1,6 @@
-import pandas as pd
+import pandas as pd                     # type: ignore
 import numpy as np
-from gensim import corpora, models
+from gensim import corpora, models      # type: ignore
 import re
 import logging
 import math
@@ -25,7 +25,7 @@ dict_corpora = [dict_1.doc2bow(i) for i in corpora_documents]
 
 # 向量的每一个元素代表了一个word在这篇文档中出现的次数
 # print(corpus)
-from gensim.corpora.mmcorpus import MmCorpus
+from gensim.corpora.mmcorpus import MmCorpus        # type: ignore
 # MmCorpus.serialize('ths_corpora.mm', dict_corpora)  # 将生成的语料保存成MM文件
 
 

@@ -41,10 +41,11 @@ def levenshtein(str1, str2):
 
 import heapq
 
-a = [1, 2, 3, 4, 5]
-re1 = map(a.index, heapq.nlargest(3, a))  # 求最大的三个索引    nsmallest与nlargest相反，求最小
-re2 = heapq.nlargest(3, a)  # 求最大的三个元素
-print(list(re1))  # 因为re1由map()生成的不是list，直接print不出来，添加list()就行了
+# do not print these ... shit ...
+# a = [1, 2, 3, 4, 5]
+# re1 = map(a.index, heapq.nlargest(3, a))  # 求最大的三个索引    nsmallest与nlargest相反，求最小
+# re2 = heapq.nlargest(3, a)  # 求最大的三个元素
+# print(list(re1))  # 因为re1由map()生成的不是list，直接print不出来，添加list()就行了
 
 
 def find_max(number, list_):

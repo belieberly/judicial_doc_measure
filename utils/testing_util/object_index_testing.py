@@ -1,9 +1,9 @@
 
 
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
+import matplotlib as mpl                    # type: ignore
+import matplotlib.pyplot as plt             # type: ignore
+# import numpy as np
+import pandas as pd                         # type: ignore
 
 
 acc_GCSX_system = [6, 10, 8, 10, 10, 8, 8, 6, 10, 6, 10, 6, 8, 6, 8, 8]

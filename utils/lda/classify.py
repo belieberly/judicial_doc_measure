@@ -1,6 +1,6 @@
-from gensim import corpora, models
+from gensim import corpora, models          # type: ignore
 import json
-from tqdm import tqdm
+from tqdm import tqdm                       # type: ignore
 
 lda = models.LdaModel.load('./lda_model/mylda_v2')
 dict_1 = corpora.Dictionary.load('./lda_model/dict_v2')
@@ -8,7 +8,7 @@ tfidf = models.TfidfModel.load("./lda_model/my_model.tfidf")
 dict_corpora = corpora.mmcorpus.MmCorpus('ths_corpora.mm')
 corpus_tfidf = tfidf[dict_corpora]
 
-dict = {}
+dict = {}                                   # type: ignore
 for num in range(78):
     dict[num] = []
 

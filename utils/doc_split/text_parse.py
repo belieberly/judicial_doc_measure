@@ -7,7 +7,7 @@ text2 = inputf2.readlines()
 
 
 def split_txt(doc_txt: list):
-    flag_list = [[] for i in range(len(doc_txt))]
+    flag_list = [[] for _ in range(len(doc_txt))]       # type: ignore
     for i in range(len(doc_txt)):
         doc_txt[i] = doc_txt[i].strip()
         if re.match(r'.*民事判决书$', doc_txt[i]):

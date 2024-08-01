@@ -1,8 +1,8 @@
 import json
 import time
 
-import requests
-from flask import Blueprint, request
+import requests                                         # type: ignore
+from flask import Blueprint, request                    # type: ignore
 from database.models import db, User,Config
 from auth import token_serializer, expires_time
 from config import oauth_config
@@ -20,33 +20,40 @@ def login():
     oauth_grant_type = oauth_config.oauth_grant_type
     oauth_redirect_uri = oauth_config.oauth_redirect_uri
     oauth_scope = oauth_config.oauth_scope
+    use_oauth = oauth_config.use_oauth
+    oauth_bypass_magic_code = oauth_config.oauth_bypass_magic_code
+    oauth_bypass_username = oauth_config.oauth_bypass_username
+    oauth_bypass_open_id = oauth_config.oauth_bypass_open_id
 
-    headers = {
-        'Authorization': oauth_token_type + ' ' + oauth_token,
-        'Content-Type': 'application/x-www-form-urlencoded'
-    }
+    if use_oauth and oauth_code != oauth_bypass_magic_code:
+        headers = {
+            'Authorization': oauth_token_type + ' ' + oauth_token,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
 
-    # 是uri不是url
-    oauth_data = {
-        'code': oauth_code,
-        'grant_type': oauth_grant_type,
-        'redirect_uri': oauth_redirect_uri,
-        'scope': oauth_scope
+        # 是uri不是url
+        oauth_data = {
+            'code': oauth_code,
+            'grant_type': oauth_grant_type,
+            'redirect_uri': oauth_redirect_uri,
+            'scope': oauth_scope
+        }
 
-    }
+        oauth_response = requests.post(url=oauth_url, data=oauth_data, headers=headers)
+        oauth_message = oauth_response.json()
+        print(oauth_message)
+        access_token = oauth_message['access_token']
 
-    oauth_response = requests.post(url=oauth_url, data=oauth_data, headers=headers)
-    oauth_message = oauth_response.json()
-    print(oauth_message)
-    access_token = oauth_message['access_token']
+        user_url = oauth_config.user_url
 
-    user_url = oauth_config.user_url
-
-    user_response = requests.get(url=user_url, params={'access_token': access_token}, headers=headers)
-    raw_user = user_response.json()
-    # print(raw_user)
-    username = raw_user['name']
-    open_id = raw_user['open_id']
+        user_response = requests.get(url=user_url, params={'access_token': access_token}, headers=headers)
+        raw_user = user_response.json()
+        # print(raw_user)
+        username = raw_user['name']
+        open_id = raw_user['open_id']
+    else:
+        username = oauth_bypass_username
+        open_id = oauth_bypass_open_id
 
     # 查得到用原来的，否则用新的 记得用first()
     tmp_user = User.query.filter_by(id=open_id).first() or User(id=open_id)
@@ -55,9 +62,9 @@ def login():
 
     config_path = open(cf.transfer_config_path, 'r', encoding='utf-8')
     config_str = json.dumps(json.load(config_path), ensure_ascii=False)
-    print(config_str)
+    # print(config_str)
     config = Config(user_id=open_id, config_json=config_str)
-    print(config)
+    # print(config)
 
     db.session.add(tmp_user)
     db.session.add(config)
@@ -76,6 +83,6 @@ def login():
         'expires': current_millis + expires_millis,
         'tokenType': token_type
     }
-    print('token',self_token)
+    # print('token',self_token)
 
     return wrap_user

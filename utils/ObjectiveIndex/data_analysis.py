@@ -1,16 +1,18 @@
 # 数据集数据分析，用来确定每个指标的阈值
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt             # type: ignore
 import numpy as np
-import seaborn as sns
+import seaborn as sns                       # type: ignore
 
 from xml.etree import ElementTree as etree
 import re
 import datetime, time
 import json
-import sys
+# import sys
 
 # sys.path.append(r'')
 # import
+
+prefix_path = 'somewhere/judicial_data/民事一审案件.tar/民事一审案件/'
 
 standard = ['文首', '首部', '事实', '理由', '依据', '主文', '尾部', '落款', '其他', '附件']
 
@@ -116,7 +118,7 @@ def met_CPFXGC(wenshu):
 
 
 # 文书细致性指标分析
-path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
+path_file = open(prefix_path+'path_min_pan_filter_len.txt', 'r', encoding='utf-8')
 
 
 def met_analysis(path_file):
@@ -126,7 +128,7 @@ def met_analysis(path_file):
     CPFXGC_count_list = []
     DSR_count_list = []
     for filepath in path_file.readlines():
-        xml_file = etree.parse('G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + filepath.strip())
+        xml_file = etree.parse(prefix_path+'msys_all/' + filepath.strip())
         root_node = xml_file.getroot()[0]
         wenshu_corr = {'文首': [], "首部": [], "事实": [], "理由": [], "依据": [], "主文": [], "尾部": [], '落款': [], '其他': [],
                        '附件': []}
@@ -175,17 +177,17 @@ def confidenceinterval(data):  # 求置信区间
 
 
 def wenshu_len_analysis():
-    path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan.txt', 'r', encoding='utf-8')
+    path_file = open(prefix_path+'path_min_pan.txt', 'r', encoding='utf-8')
     len_ = []
     count = 0
     count1 = 0
-    out_path = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'w', encoding='utf-8')
+    out_path = open(prefix_path+'path_min_pan_filter_len.txt', 'w', encoding='utf-8')
     for filepath in path_file.readlines():
         count += 1
         print(count)
         if count >= 50000:
             break
-        xml_file = etree.parse('G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + filepath.strip())
+        xml_file = etree.parse(prefix_path+'msys_all/' + filepath.strip())
         root_node = xml_file.getroot()[0]
         flag = 0
         for node in root_node:
@@ -226,7 +228,7 @@ def wenshu_date(path_file):
                      '新疆维吾尔自治区': 0, '西藏区': 0, '吉林省': 0, '宁夏回族自治区': 0}
     date_list = {}
     for filepath in path_file.readlines():
-        xml_file = etree.parse('G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + filepath.strip())
+        xml_file = etree.parse(prefix_path+'msys_all/' + filepath.strip())
         root_node = xml_file.getroot()[0]
         flag = 0
         for node in root_node:
@@ -370,7 +372,7 @@ def date_analysis():
     for filepath in path_file.readlines():
         count += 1
         print(count)
-        xml_file = etree.parse('G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + filepath.strip())
+        xml_file = etree.parse(prefix_path+'msys_all/' + filepath.strip())
         root_node = xml_file.getroot()[0]
         date_dic = del_date(root_node)
         if date_dic['案件受理时间'] != '' and date_dic['案件发生时间'] != '':
@@ -404,7 +406,7 @@ def rea_analysis():
     for filepath in path_file.readlines():
         count += 1
         print(count)
-        xml_file = etree.parse('G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + filepath.strip())
+        xml_file = etree.parse(prefix_path+'msys_all/' + filepath.strip())
         root_node = xml_file.getroot()[0]
         for node in root_node:
             if node.tag == 'AJJBQK':

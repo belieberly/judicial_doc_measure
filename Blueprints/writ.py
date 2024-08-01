@@ -1,6 +1,6 @@
 # from flasgger import swag_from
-from flask import Blueprint, request, jsonify, g
-from database.models import db, User, JudicialDoc
+from flask import Blueprint, request, jsonify, g        # type: ignore
+from database.models import db, JudicialDoc
 import config as cf
 import zipfile
 import uuid
@@ -8,7 +8,8 @@ import json
 import web_utils
 from auth import auth
 import time
-from sqlalchemy.sql import and_, True_
+from sqlalchemy.sql import and_         # type: ignore
+import os
 
 blueprint_writ = Blueprint('writ', __name__)
 
@@ -40,7 +41,7 @@ def upload_file():
                         continue
                     else:
                         tmp_uuid = str(uuid.uuid4())
-                        upload_path = basepath + tmp_uuid + name.split('/')[-1]
+                        upload_path = os.path.join(basepath, tmp_uuid + name.split('/')[-1])
                         # print(upload_path)
                         hFile = open(upload_path, 'wb')
                         file_bytes = zf.read(name)
@@ -57,7 +58,7 @@ def upload_file():
                 print('文件类型为xml')
                 tmp_uuid = str(uuid.uuid4())
                 name = file_list[0].filename
-                upload_path = basepath + tmp_uuid + '_' + name
+                upload_path = os.path.join(basepath, tmp_uuid + '_' + name)
                 file2save = open(upload_path, 'wb')
                 tmp_file = file_list[0]
                 file_bytes = tmp_file.read()
@@ -81,7 +82,7 @@ def upload_file():
                 else:
                     tmp_uuid = str(uuid.uuid4())
                     # upload_path = os.path.join(basepath,filename)
-                    upload_path = basepath + tmp_uuid + '_' + name
+                    upload_path = os.path.join(basepath, tmp_uuid + '_' + name)
                     file.save(upload_path)
                     print('保存成功')
                     doc = JudicialDoc(id=tmp_uuid, user_id=g.user['open_id'], docname=name, date=upload_time,

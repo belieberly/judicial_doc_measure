@@ -5,9 +5,10 @@ from multiprocessing.dummy import Pool
 # from multiprocessing import Pool
 from xml.etree import ElementTree as etree
 
-import numpy as np
+# import numpy as np
 
-from utils.SubjectiveIndex.copy_detect import long_detect, levenshtein
+from utils.SubjectiveIndex.copy_detect import long_detect
+# from utils.SubjectiveIndex.copy_detect import levenshtein
 import config as cf
 from utils.SubjectiveIndex.sentiment_classify import sentiment_index as sentiment
 from utils.SubjectiveIndex.sentiment_classify import sentiment_index1 as text_style
@@ -177,7 +178,7 @@ def subjective_measure(filepath, subject_list):
 #
 #
 # if __name__ == '__main__':
-#     filepath = 'D:/NJU/final_project/data/example/0.xml'
+#     filepath = 'somwhere/NJU/final_project/data/example/0.xml'
 #     wenshu_corr = {'文首': [], "首部": [], "事实": [], "理由": [], "依据": [], "主文": [], "尾部": [], '落款': [], '附件': [], '其他': {}}
 #     subject_index = {
 #         "text_style_classification_": 1,
@@ -231,8 +232,9 @@ def subjective_measure1(filepath, subject_list):
 
 
 
-def subject_time():
-    path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
+def test_subject_time():
+    test_prefix = 'G:/judicial_data/民事一审案件.tar/民事一审案件/'
+    path_file = open(test_prefix+'path_min_pan_filter_len.txt', 'r', encoding='utf-8')
     res_file = open('../../data/subject.csv', 'w', encoding='utf-8')
     time_file = open('../../data/subject_time_tmp.csv', 'w', encoding='utf-8')
     subject_list = {
@@ -249,7 +251,7 @@ def subject_time():
         count += 1
         if count > 100:
             break
-        path = 'G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + path.strip()
+        path = test_prefix+'/msys_all/' + path.strip()
         print('待检测文书名称为：' + path)
         subject_score, subject_score_dic, law_articles_res, sentiment_res, text_style_res, copy_detect_res, res = subjective_measure1(path, subject_list)
         tmp.append(res)
@@ -273,4 +275,4 @@ def subject_time():
 
 
 if __name__=='__main__':
-    subject_time()
+    test_subject_time()

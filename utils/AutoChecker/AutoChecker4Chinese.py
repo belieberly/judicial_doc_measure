@@ -2,9 +2,9 @@
 # -*- coding:utf-8 -*-
 __author__ = "zpgao"
 
-import sys
-import pinyin
-import jieba.posseg as pseg
+# import sys
+import pinyin                       # type: ignore
+import jieba.posseg as pseg         # type: ignore
 import string
 
 # import re

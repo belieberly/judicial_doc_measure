@@ -1,4 +1,4 @@
-import json
+# import json
 from utils.ObjectiveIndex import main as obj_main
 from utils.SubjectiveIndex import main as sub_main
 import web_utils
@@ -97,7 +97,7 @@ def get_report_info(filepath):
     for node in root_node:
         if node.tag == 'WS':
             WS_txt = node.get('value').strip()
-            print(WS_txt)
+            # print(WS_txt)
             if re.match(r'(北京市|广东省|山东省|江苏省|河南省|上海市|河北省|浙江省|陕西省|湖南省|重庆市|福建省|天津市|云南省|四川省|广西壮族自治区|安徽省|海南省|江西省|'
                         r'湖北省|山西省|辽宁省|黑龙江|内蒙古自治区|贵州省|甘肃省|青海省|新疆维吾尔自治区|西藏区|吉林省|宁夏回族自治区).*', WS_txt):
                 # 获取地点
@@ -108,7 +108,7 @@ def get_report_info(filepath):
                 # 获取时间
             if re.match(r'.*（([0-9]{4})）.{0,8}初字第[0-9]{0,6}号', WS_txt):
                 writ_date = re.match(r'.*（([0-9]{4})）.{0,8}初字第[0-9]{0,6}号', WS_txt).group(1)
-    print(province, writ_date)
+    # print(province, writ_date)
     return province, writ_date
 
 
@@ -122,7 +122,7 @@ def doc_measure(filepath, input_index_dic):
                                                                                                          wenshu_corr)
     subject_score, subject_score_dic, law_articles_res, sentiment_res, text_style_res, copy_detect_res = \
         sub_main.subjective_measure(filepath, subject_list)
-    print(object_index)
+    # print(object_index)
     province, writ_date = get_report_info(filepath)
     json_res = get_report_json(index_list, object_score, object_score_dict, wenshu_content, index_res,
                                subject_score, wenshu_corr, subject_score_dic, law_articles_res, sentiment_res,
@@ -134,7 +134,7 @@ def doc_measure(filepath, input_index_dic):
 
 #
 # if __name__ == '__main__':
-#     filepath = 'D:/NJU/final_project/data/example/0.xml'
+#     filepath = 'somwhere/NJU/final_project/data/example/0.xml'
 #     input_index_dict = {
 #         "met_CSR": 0,
 #         "met_AJJBQK": 1,

@@ -1,15 +1,15 @@
 # text style classification
-
 import re
 from xml.etree import ElementTree as etree
 
+store_path = "somewhere/judicial_data/民事一审案件.tar/民事一审案件"
 
 def preprocess_judicial():
-    file_list = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
+    file_list = open(store_path+'/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
     file_out = open('../../data/text_style_classification/sentiment.train.0', 'w', encoding='utf-8')
     count = 0
     for line in file_list.readlines():
-        xml_file = etree.parse('G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + line.strip())
+        xml_file = etree.parse(store_path+'/msys_all/' + line.strip())
         root_node = xml_file.getroot()[0]
         print(count)
         for node in root_node:
@@ -47,6 +47,8 @@ def preprocess_news():
         if count > 35000:
             break
     print('我也完成啦')
+
+
 if __name__=='__main__':
     preprocess_judicial()
     preprocess_news()

@@ -1,9 +1,9 @@
-import pandas as pd
-from gensim import corpora, models
-from gensim.corpora.mmcorpus import MmCorpus
-import re
+# import pandas as pd
+# from gensim import corpora, models
+# from gensim.corpora.mmcorpus import MmCorpus
+# import re
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt                # type: ignore
 
 T = []
 power = []

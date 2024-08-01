@@ -3,6 +3,7 @@ import web_utils
 from config import *
 import config as cf
 import json
+from config import usr_cwd
 
 names = locals()
 
@@ -97,8 +98,8 @@ def task_report(report_path_list, index_dic, task_name, tmp_task_uuid, task_date
 
 if __name__ == '__main__':
     report_path_list = [
-        'E:/pycharm/judicial_doc_measurement/web_data/writ_report/b799e9c9-ede1-4243-ab28-b3d1ea7c1e4e.json',
-        'E:/pycharm/judicial_doc_measurement/web_data/writ_report/2e5ca696-7d11-4aa7-b9a0-6183bf41c094.json']
+        usr_cwd+'/web_data/writ_report/b799e9c9-ede1-4243-ab28-b3d1ea7c1e4e.json',
+        usr_cwd+'/web_data/writ_report/2e5ca696-7d11-4aa7-b9a0-6183bf41c094.json']
     index_dic = {
         "met_CSR_": 1,
         "met_AJJBQK_": 1,
@@ -120,4 +121,4 @@ if __name__ == '__main__':
         "copy_detect_index_": 1,
         "law_articles_rational_": 1
     }
-    task_report(report_path_list, index_dic)
+    # task_report(report_path_list, index_dic)

@@ -11,8 +11,8 @@ report/
 *.jpg
 *.csv
 *.zip
-data/
-*.pkl
+# data/
+# *.pkl
 temp_env/
 *.xls
 static/

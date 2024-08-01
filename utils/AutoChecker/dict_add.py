@@ -1,4 +1,3 @@
-
 # 加入司法领域词典
 def dic_add(add_file_path, target_file_path):
     with open(add_file_path, 'r') as add_file:

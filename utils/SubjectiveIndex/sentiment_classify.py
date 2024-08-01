@@ -1,12 +1,12 @@
 #
 import json
-import re
+# import re
 
-import requests
+import requests     # type: ignore
 #
 from utils.SVC.comment_predict import svm_predict, svm_predict1
 
-import config as cf
+# import config as cf
 
 
 def get_sentiment_result(text):

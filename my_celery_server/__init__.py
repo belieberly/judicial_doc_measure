@@ -1,12 +1,8 @@
-from celery import Celery
-from flask import Flask
+from celery import Celery       # type: ignore
+from flask import Flask         # type: ignore
 
 from config import DevConfig
 from database import db
-
-
-
-
 
 celery_server = Celery(include='my_celery_server.tasks')
 
@@ -39,7 +35,6 @@ tempDec = celery_server.task
 def my_task(*args, **kwargs):
     def deco(fn):
         return tempDec(*args, **kwargs)(with_context(fn))
-
     return deco
 
 

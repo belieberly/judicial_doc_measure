@@ -1,5 +1,3 @@
-
-
 from my_celery_server import celery_server
 from database.models import db, JudicialDoc, Report, Task, AnalysisReport
 from utils import measure
@@ -9,6 +7,7 @@ import config as cf
 import uuid
 import json
 from config.log_config import logger
+import os
 
 # from multiprocessing import current_process
 # current_process()._config = {'semprefix': '/mp'}
@@ -19,7 +18,7 @@ def flask_app_context():
     celery使用Flask上下文
     :return:
     """
-    from flask import current_app
+    from flask import current_app       # type: ignore
     with current_app.app_context():
         print(current_app.name)
         result = str(current_app.config)
@@ -41,7 +40,7 @@ def doc_measure_thread(writ_id: str, input_index_dic: dict):
     report_json, province, writ_date = measure.doc_measure(filepath, input_index_dic)
     report_json['title'] = file_name
     report_json['time'] = file_date
-    report_file_path = cf.writ_report_base_dir + writ_id + '.json'
+    report_file_path = os.path.join(cf.writ_report_base_dir, writ_id + '.json')
     report_file = open(report_file_path, 'w', encoding='utf-8')
     json.dump(report_json, report_file, ensure_ascii=False)
     tmp_uuid = str(uuid.uuid4())
@@ -77,7 +76,7 @@ def task_measure(writ_id_list, input_index_dic, task_name, tmp_task_uuid, task_d
             report_json, province, writ_date = measure.doc_measure(filepath, input_index_dic)
             report_json['title'] = file_name
             report_json['time'] = file_date
-            report_file_path = cf.writ_report_base_dir + writ_id + '.json'
+            report_file_path = os.path.join(cf.writ_report_base_dir, writ_id + '.json')
             # with自动close文件，不会出现截断的情况
             with open(report_file_path, 'w', encoding='utf-8') as report_file:
                 json.dump(report_json, report_file, ensure_ascii=False)
@@ -100,7 +99,7 @@ def task_measure(writ_id_list, input_index_dic, task_name, tmp_task_uuid, task_d
                     writ_date_dic[writ_date] = 1
             db.session.commit()
         task_report_json = analysis.task_report(report_path_list, input_index_dic, task_name, tmp_task_uuid, task_date)
-        task_report_loc = cf.task_report_base_dir + tmp_task_uuid + '.json'
+        task_report_loc = os.path.join(cf.task_report_base_dir, tmp_task_uuid + '.json')
         task_report_file = open(task_report_loc,'w',encoding='utf-8')
         json.dump(task_report_json, task_report_file, ensure_ascii=False)
         tmp_analysis_id = str(uuid.uuid4())

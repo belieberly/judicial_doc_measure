@@ -2,15 +2,13 @@
 import time
 import uuid
 
-from flask import Blueprint, request, jsonify, g
-from sqlalchemy import and_
+from flask import Blueprint, request, jsonify, g        # type: ignore
+from sqlalchemy import and_                             # type: ignore
 
-from database.models import db, User, JudicialDoc, Task
-import config as cf
+from database.models import db, User, Task
 import json
 import web_utils
 from auth import auth
-import _thread
 
 from my_celery_client import my_celery_app
 

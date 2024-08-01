@@ -1,5 +1,5 @@
 from logging import config as my_log_config
-from celery.utils.log import get_task_logger
+from celery.utils.log import get_task_logger        # type: ignore
 
 LOG_CONFIG = {
     'version': 1,

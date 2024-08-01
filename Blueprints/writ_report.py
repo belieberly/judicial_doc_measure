@@ -1,13 +1,10 @@
 import json
 from auth import auth
-from flask import Blueprint, request, jsonify, g
-from database.models import db, User, JudicialDoc, Report, Config
+from flask import Blueprint, request, g     # type: ignore
+from database.models import db, User, JudicialDoc, Report
 from my_celery_client import my_celery_app
 
 blueprint_writ_report = Blueprint('writ_report', __name__)
-
-
-
 
 @blueprint_writ_report.route('', methods=['POST'])
 # @swag_from('../api_description/get_writ_report.yml')
@@ -29,11 +26,10 @@ def doc_measure():
         # _thread.start_new_thread(doc_measure_thread,(writ_id,input_index_dic))
         print('celery啥时候调度啊')
         my_celery_app.send_task('doc_measure_thread', args=[writ_id, input_index_dic])
-    except:
+    except Exception as e:
+        raise e                     # debug only
         print('无法启动线程')
     return '后端开始检测'
-
-
 
 
 @blueprint_writ_report.route('/<writ_id>', methods=['GET'])

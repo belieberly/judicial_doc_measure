@@ -1,4 +1,4 @@
-import jieba
+import jieba        # type: ignore
 import re
 
 #去除描述信息中无用的被告，原告，姓名和日期等信息

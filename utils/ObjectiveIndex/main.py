@@ -2,15 +2,14 @@
 # input: 数据源为xml格式的裁判文书
 # 输出直接显示在页面上，为错误信息提示-->输出json给前端
 # 未确定如何打分-->已解决
-
 from xml.etree import ElementTree as etree
 import re
 import datetime, time
 import json
 import config as cf
 from config import *
-import sys
-import numpy as np
+# import sys
+# import numpy as np
 
 standard = ['文首', '首部', '事实', '理由', '依据', '主文', '尾部', '落款', '附件', '其他']
 
@@ -503,8 +502,8 @@ def com_SFCD(wenshu, wenshu_corr):
 # 加载案由列表
 def load_ay():
     # 处理得到案由列表
-    # ay_file = open('D:/NJU/final_project/data/anyou.txt', 'r', encoding='utf-8')
-    # ay_out = open('D:/NJU/final_project/data/AY.txt', 'w', encoding='utf-8')
+    # ay_file = open('somwhere/NJU/final_project/data/anyou.txt', 'r', encoding='utf-8')
+    # ay_out = open('somwhere/NJU/final_project/data/AY.txt', 'w', encoding='utf-8')
     # for line in ay_file.readlines():
     #     if '、' in line:
     #         ay_out.write(''.join(line.split('、',1)[1]))
@@ -512,7 +511,7 @@ def load_ay():
     #         ay_out.write(line)
     # ay_file.close()
     # ay_out.close()
-    ay_file = open('D:/NJU/final_project/data/AY.txt', 'r', encoding='utf-8')
+    ay_file = open(cf.ay_path, 'r', encoding='utf-8')
     ay_list = []
     for line in ay_file.readlines():
         ay_list.append(line.split('\n')[0])
@@ -877,7 +876,7 @@ def objective_measure1(filepath, object_list, wenshu_corr):
 
 
 # if __name__ == '__main__':
-#     filepath = 'D:/NJU/final_project/data/example/0.xml'
+#     filepath = 'somwhere/NJU/final_project/data/example/0.xml'
 #     xml_file = etree.parse(filepath)
 #     root_node = xml_file.getroot()[0]
 #     # del_date(root_node)
@@ -944,18 +943,19 @@ def test_object_time():
                    "acc_GCSX",
                    "acc_SLJG",
                    "acc_CSR"]
-    path_file = open('G:/judicial_data/民事一审案件.tar/民事一审案件/path_min_pan_filter_len.txt', 'r', encoding='utf-8')
+    test_prefix = 'somewhere/judicial_data/民事一审案件.tar/民事一审案件'
+    path_file = open(test_prefix+'path_min_pan_filter_len.txt', 'r', encoding='utf-8')
     res_file = open('../../data/object_tmp.csv', 'w', encoding='utf-8')
-    time_file = open('../../data/object_time_tmp.csv', 'w', encoding='utf-8')
+    # time_file = open('../../data/object_time_tmp.csv', 'w', encoding='utf-8')
     count = 0
-    tmp = []
+    # tmp = []
     time_res = []
     for path in path_file.readlines():
         time_start = time.time()
         count += 1
         if count > 100:
             break
-        path = 'G:/judicial_data/民事一审案件.tar/民事一审案件/msys_all/' + path.strip()
+        path = test_prefix + 'msys_all/' + path.strip()
         print('待检测文书名称为：' + path)
         wenshu_corr = {'文首': [], "首部": [], "事实": [], "理由": [], "依据": [], "主文": [], "尾部": [], '落款': [], '附件': [],
                        '其他': {}}
@@ -983,9 +983,8 @@ def test_object_time():
     # print(std)
     # print(time_res)
 
-#
-if __name__ == '__main__':
-    test_object_time()
+# if __name__ == '__main__':
+#     test_object_time()
 # object_score, wenshu_corr, object_score_dic, wenshu_content, index_res = objective_measure(filepath, index_dic,
 #                                                                                            object_index,
 #                                                                                            wenshu_corr)

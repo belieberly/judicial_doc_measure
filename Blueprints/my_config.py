@@ -1,5 +1,5 @@
-from flasgger import swag_from
-from flask import Blueprint, jsonify, g, request
+# from flasgger import swag_from                          # type: ignore
+from flask import Blueprint, jsonify, g, request        # type: ignore
 
 from auth import auth
 from database.models import Config, db
@@ -8,7 +8,7 @@ from config import *
 
 names = locals()
 
-import web_utils
+# import web_utils
 
 blueprint_my_config = Blueprint('my_config', __name__)
 

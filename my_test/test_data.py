@@ -1,6 +1,7 @@
 import json
 from config import *
-from flask import jsonify
+# from flask import jsonify
+
 names =locals()
 index = {'met_CSR': '参诉人信息细致性', 'met_AJJBQK': '事实部分细致性', 'met_CPFXGC': '理由部分细致性',
          'del_date': '延迟性', 'aut_AY': '案由信息类别规范性', 'aut_CPYJ': '裁判依据引用规范性',
@@ -9,7 +10,6 @@ index = {'met_CSR': '参诉人信息细致性', 'met_AJJBQK': '事实部分细�
          'acc_GCSX': '构成事项准确性', 'acc_SLJG': '审理经过准确性', 'acc_CSR': '参诉人信息准确性',
          'text_style_classification': '语言风格鲜明性', 'sentiment_index': '客观程度',
          'copy_detect_index': '语言抄袭检测', 'law_articles_rational': '法条合理性'}
-
 
 def test_date():
     inputf = open('./transfer_config.json','r',encoding='utf-8')

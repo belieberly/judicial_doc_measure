@@ -1,10 +1,10 @@
 # 训练
-from gensim.models.word2vec import Word2Vec
-from sklearn.preprocessing import StandardScaler
+from gensim.models.word2vec import Word2Vec                     # type: ignore
+from sklearn.preprocessing import StandardScaler                # type: ignore
 from utils.SVC.preprocession import load_file_and_split
 import numpy as np
-import joblib
-from sklearn import svm
+import joblib                                                   # type: ignore
+from sklearn import svm                                         # type: ignore
 
 
 # 获得句子中所有词汇的向量，然后取平均值

@@ -1,6 +1,4 @@
-import _thread
-
-from flask import Blueprint, send_file, request, g, abort
+from flask import Blueprint, send_file, g, abort        # type: ignore
 
 from auth import auth
 from database.models import AnalysisReport, User

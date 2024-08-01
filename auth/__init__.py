@@ -1,7 +1,7 @@
 from config import oauth_config
-from flask import g
-from flask_httpauth import HTTPTokenAuth
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, SignatureExpired, BadHeader
+from flask import g                                 # type: ignore
+from flask_httpauth import HTTPTokenAuth            # type: ignore
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, SignatureExpired, BadHeader     # type: ignore
 
 expires_time = oauth_config.expires_time
 secret_key = oauth_config.secret_key
