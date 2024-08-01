@@ -40,13 +40,13 @@
    pip install -r requirements.txt
    ```
 
-5. 运行Python
+5. 运行Python (独立Terminal)
 
    ```shell
    python run.py
    ```
 
-6. 运行Celery
+6. 运行Celery (独立Terminal)
 
    ```shell
    celery -A my_celery_server.tasks worker -l info
