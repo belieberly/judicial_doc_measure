@@ -22,27 +22,31 @@
 
 ## 运行
 
-0. 修改配置文件
+1. 启动Redis
+
+2. 启动MySQL并创建数据库
+
+   ```sql
+   CREATE DATABASE IF NOT EXISTS judicial_doc_measurement CHARACTER SET UTF8MB4;
+   ```
+
+3. 修改配置文件
 
    修改`config/global_vars.py`中的数据库配置和redis配置等
 
-1. 安装依赖包
+4. 安装依赖包
 
    ```shell
    pip install -r requirements.txt
    ```
 
-2. 运行Python
+5. 运行Python
 
    ```shell
    python run.py
    ```
 
-3. 启动Redis
-
-4. 启动MySQL
-
-5. 运行Celery
+6. 运行Celery
 
    ```shell
    celery -A my_celery_server.tasks worker -l info
