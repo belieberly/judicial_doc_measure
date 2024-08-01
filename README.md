@@ -1,6 +1,6 @@
 # 裁判文书质量评估平台
 
-### 环境设置
+## 环境设置
 
 语言环境：python 3.6
 
@@ -16,11 +16,11 @@
 
 其他依赖包：requirements.txt
 
-### 简介
+## 简介
 
 评估平台后端，为民事一审裁判文书提供客观质量度量和主观质量度量服务，接口文件说明在api_description中。
 
-### 运行
+## 运行
 
 0. 修改配置文件
 
@@ -48,6 +48,6 @@
    celery -A my_celery_server.tasks worker -l info
    ```
 
-### 访问API Docs
+## 访问API Docs
 
 后端运行后点击[http://localhost:5000/apidocs/](http://localhost:5000/apidocs/)查看API文档
