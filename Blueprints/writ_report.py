@@ -27,7 +27,7 @@ def doc_measure():
         print('celery啥时候调度啊')
         my_celery_app.send_task('doc_measure_thread', args=[writ_id, input_index_dic])
     except Exception as e:
-        raise e                     # debug only
+        # raise e                     # debug only
         print('无法启动线程')
     return '后端开始检测'
 
